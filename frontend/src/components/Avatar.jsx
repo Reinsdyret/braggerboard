@@ -1,4 +1,17 @@
 import { participantImageUrl } from "../api.js";
+import { cx } from "../utils/cx.js";
+
+const SIZES = {
+  sm: "h-8 w-8 text-xs",
+  md: "h-10 w-10 text-sm",
+  lg: "h-14 w-14 text-lg",
+};
+
+const RING_COLORS = {
+  gold: "ring-amber-400",
+  silver: "ring-gray-400",
+  bronze: "ring-orange-400",
+};
 
 function initials(name) {
   return name
@@ -9,14 +22,14 @@ function initials(name) {
     .join("");
 }
 
-export default function Avatar({ participant, size = 40 }) {
-  const style = { width: size, height: size, fontSize: size * 0.4 };
+export default function Avatar({ participant, size = "md", rankColor }) {
+  const sizeClass = SIZES[size];
+  const ringClass = rankColor ? cx("ring-2 ring-offset-2", RING_COLORS[rankColor]) : "";
 
   if (participant.hasImage) {
     return (
       <img
-        className="avatar"
-        style={style}
+        className={cx("shrink-0 rounded-full object-cover", sizeClass, ringClass)}
         src={participantImageUrl(participant.id)}
         alt={participant.name}
       />
@@ -24,7 +37,13 @@ export default function Avatar({ participant, size = 40 }) {
   }
 
   return (
-    <div className="avatar avatar-placeholder" style={style}>
+    <div
+      className={cx(
+        "flex shrink-0 items-center justify-center rounded-full bg-brand-100 font-semibold text-brand-700",
+        sizeClass,
+        ringClass,
+      )}
+    >
       {initials(participant.name)}
     </div>
   );

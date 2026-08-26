@@ -24,7 +24,7 @@ export function createLeaderboard(name) {
 }
 
 export function getLeaderboard(id) {
-  return fetch(`${API_BASE}/leaderboards/${id}`).then(handle);
+  return fetch(`${API_BASE}/leaderboards/${id}`, { cache: "no-store" }).then(handle);
 }
 
 export function addParticipant(leaderboardId, name, imageFile) {
@@ -51,7 +51,7 @@ export function addRound(leaderboardId, label, results) {
 }
 
 export function getRounds(leaderboardId) {
-  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/rounds`).then(handle);
+  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/rounds`, { cache: "no-store" }).then(handle);
 }
 
 export function participantImageUrl(participantId) {

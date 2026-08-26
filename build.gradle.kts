@@ -40,15 +40,10 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-val FRONTEND_STATIC_LOCATION = "build/resources/main/static"
-
-tasks.bootJar {
-    doFirst {
-        copy {
-            includeEmptyDirs = true
-            from(project.file("frontend/build"))
-            into(project.file(FRONTEND_STATIC_LOCATION))
-        }
+tasks.processResources {
+    dependsOn("assembleFrontend")
+    from(project.file("frontend/build")) {
+        into("static")
     }
 }
 

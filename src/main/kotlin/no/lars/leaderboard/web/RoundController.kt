@@ -4,7 +4,9 @@ import no.lars.leaderboard.domain.Round
 import no.lars.leaderboard.domain.RoundResultInput
 import no.lars.leaderboard.repository.RoundRepository
 import no.lars.leaderboard.service.LeaderboardService
+import org.springframework.http.CacheControl
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -32,8 +34,10 @@ class RoundController(
     }
 
     @GetMapping("/api/leaderboards/{leaderboardId}/rounds")
-    fun list(@PathVariable leaderboardId: UUID): List<Round> {
+    fun list(@PathVariable leaderboardId: UUID): ResponseEntity<List<Round>> {
         leaderboardService.requireExists(leaderboardId)
-        return roundRepository.findByLeaderboardId(leaderboardId)
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(roundRepository.findByLeaderboardId(leaderboardId))
     }
 }
