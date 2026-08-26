@@ -66,4 +66,43 @@ class EloLeaderboardFlowTest {
         assertThat(ratingsByName["P1"]).isEqualTo(984)
         assertThat(ratingsByName["P2"]).isEqualTo(984)
     }
+
+    @Test
+    fun `editing a match's outcome recomputes ratings from the corrected result`() {
+        val leaderboard = leaderboardRepository.create("Chess Club 2", ScoringMode.ELO, MatchFormat.ONE_V_ONE)
+        val alice = participantRepository.create(leaderboard.id, "Alice", null)
+        val bob = participantRepository.create(leaderboard.id, "Bob", null)
+
+        val match = matchRepository.create(
+            leaderboard.id,
+            MatchInput(listOf(alice.id), listOf(bob.id), MatchOutcome.TEAM_A),
+        )
+
+        // Mis-entered: it was actually Bob who won.
+        matchRepository.update(match.id, MatchInput(listOf(alice.id), listOf(bob.id), MatchOutcome.TEAM_B))
+
+        val details = leaderboardService.getDetails(leaderboard.id)
+        val ratingsByName = details.participants.associate { it.name to it.rating }
+
+        assertThat(ratingsByName["Bob"]).isEqualTo(1016)
+        assertThat(ratingsByName["Alice"]).isEqualTo(984)
+    }
+
+    @Test
+    fun `deleting a match reverts ratings as if it never happened`() {
+        val leaderboard = leaderboardRepository.create("Chess Club 3", ScoringMode.ELO, MatchFormat.ONE_V_ONE)
+        val alice = participantRepository.create(leaderboard.id, "Alice", null)
+        val bob = participantRepository.create(leaderboard.id, "Bob", null)
+
+        val match = matchRepository.create(
+            leaderboard.id,
+            MatchInput(listOf(alice.id), listOf(bob.id), MatchOutcome.TEAM_A),
+        )
+
+        matchRepository.delete(match.id)
+
+        val details = leaderboardService.getDetails(leaderboard.id)
+        assertThat(details.participants).allSatisfy { assertThat(it.rating).isEqualTo(1000) }
+        assertThat(matchRepository.findByLeaderboardId(leaderboard.id)).isEmpty()
+    }
 }

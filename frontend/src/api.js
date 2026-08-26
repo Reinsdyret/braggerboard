@@ -66,6 +66,18 @@ export function getMatches(leaderboardId) {
   return fetch(`${API_BASE}/leaderboards/${leaderboardId}/matches`, { cache: "no-store" }).then(handle);
 }
 
+export function updateMatch(matchId, teamA, teamB, outcome) {
+  return fetch(`${API_BASE}/matches/${matchId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ teamA, teamB, outcome }),
+  }).then(handle);
+}
+
+export function deleteMatch(matchId) {
+  return fetch(`${API_BASE}/matches/${matchId}`, { method: "DELETE" }).then(handle);
+}
+
 export function participantImageUrl(participantId) {
   return `${API_BASE}/participants/${participantId}/image`;
 }

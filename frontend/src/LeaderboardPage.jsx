@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ArrowNarrowLeft, Copy01, AlertCircle } from "@untitledui/icons";
-import { deleteParticipant, getLeaderboard, getRounds, getMatches } from "./api.js";
+import { deleteParticipant, getLeaderboard, getRounds, getMatches, deleteMatch } from "./api.js";
 import { saveRecent } from "./recents.js";
 import { useToast } from "./components/ui/ToastProvider.jsx";
 import Button from "./components/ui/Button.jsx";
@@ -14,6 +14,7 @@ import RoundHistory from "./components/RoundHistory.jsx";
 import AddMatchForm from "./components/AddMatchForm.jsx";
 import MatchHistory from "./components/MatchHistory.jsx";
 import PlayerCard from "./components/PlayerCard.jsx";
+import EditMatchDialog from "./components/EditMatchDialog.jsx";
 
 export default function LeaderboardPage() {
   const { leaderboardId } = useParams();
@@ -22,6 +23,7 @@ export default function LeaderboardPage() {
   const [matches, setMatches] = useState([]);
   const [loadError, setLoadError] = useState(null);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [editingMatch, setEditingMatch] = useState(null);
   const addToast = useToast();
 
   const refresh = useCallback(async () => {
@@ -49,6 +51,16 @@ export default function LeaderboardPage() {
     try {
       await deleteParticipant(participant.id);
       addToast(`${participant.name} removed`, { type: "error", duration: 2500 });
+      await refresh();
+    } catch (err) {
+      addToast(err.message, { type: "error" });
+    }
+  }
+
+  async function handleDeleteMatch(match) {
+    try {
+      await deleteMatch(match.id);
+      addToast("Match deleted", { type: "error", duration: 2500 });
       await refresh();
     } catch (err) {
       addToast(err.message, { type: "error" });
@@ -149,7 +161,11 @@ export default function LeaderboardPage() {
       <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase">
         {isElo ? "Match history" : "Round history"}
       </h2>
-      {isElo ? <MatchHistory matches={matches} /> : <RoundHistory rounds={rounds} />}
+      {isElo ? (
+        <MatchHistory matches={matches} onEdit={setEditingMatch} onDelete={handleDeleteMatch} />
+      ) : (
+        <RoundHistory rounds={rounds} />
+      )}
 
       <PlayerCard
         participant={selectedParticipant}
@@ -158,6 +174,16 @@ export default function LeaderboardPage() {
         isOpen={Boolean(selectedParticipant)}
         onOpenChange={(open) => !open && setSelectedParticipant(null)}
       />
+
+      {isElo && (
+        <EditMatchDialog
+          match={editingMatch}
+          participants={leaderboard.participants}
+          isOpen={Boolean(editingMatch)}
+          onOpenChange={(open) => !open && setEditingMatch(null)}
+          onUpdated={refresh}
+        />
+      )}
     </div>
   );
 }

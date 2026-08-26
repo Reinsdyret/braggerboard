@@ -42,6 +42,35 @@ class MatchRepository(private val jdbcTemplate: JdbcTemplate) {
         return findById(matchId)!!
     }
 
+    @Transactional
+    fun update(matchId: UUID, input: MatchInput): Match? {
+        val updated = jdbcTemplate.update(
+            "UPDATE match SET outcome = ? WHERE id = ?",
+            input.outcome.name,
+            matchId,
+        )
+        if (updated == 0) return null
+
+        jdbcTemplate.update("DELETE FROM match_participant WHERE match_id = ?", matchId)
+
+        val rows = input.teamA.map { it to "A" } + input.teamB.map { it to "B" }
+        jdbcTemplate.batchUpdate(
+            "INSERT INTO match_participant (id, match_id, participant_id, team) VALUES (?, ?, ?, ?)",
+            rows,
+            rows.size,
+        ) { ps, (participantId, team) ->
+            ps.setObject(1, UUID.randomUUID())
+            ps.setObject(2, matchId)
+            ps.setObject(3, participantId)
+            ps.setString(4, team)
+        }
+
+        return findById(matchId)
+    }
+
+    fun delete(matchId: UUID): Boolean =
+        jdbcTemplate.update("DELETE FROM match WHERE id = ?", matchId) > 0
+
     fun findById(matchId: UUID): Match? {
         val match = jdbcTemplate.query(
             "SELECT id, leaderboard_id, outcome, created_at FROM match WHERE id = ?",
