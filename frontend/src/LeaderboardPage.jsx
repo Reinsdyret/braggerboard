@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ArrowNarrowLeft, Copy01, AlertCircle } from "@untitledui/icons";
-import { deleteParticipant, getLeaderboard, getRounds } from "./api.js";
+import { deleteParticipant, getLeaderboard, getRounds, getMatches } from "./api.js";
 import { saveRecent } from "./recents.js";
 import { useToast } from "./components/ui/ToastProvider.jsx";
 import Button from "./components/ui/Button.jsx";
@@ -11,22 +11,29 @@ import StandingsTable from "./components/StandingsTable.jsx";
 import AddParticipantForm from "./components/AddParticipantForm.jsx";
 import AddRoundForm from "./components/AddRoundForm.jsx";
 import RoundHistory from "./components/RoundHistory.jsx";
+import AddMatchForm from "./components/AddMatchForm.jsx";
+import MatchHistory from "./components/MatchHistory.jsx";
+import PlayerCard from "./components/PlayerCard.jsx";
 
 export default function LeaderboardPage() {
   const { leaderboardId } = useParams();
   const [leaderboard, setLeaderboard] = useState(null);
   const [rounds, setRounds] = useState([]);
+  const [matches, setMatches] = useState([]);
   const [loadError, setLoadError] = useState(null);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
   const addToast = useToast();
 
   const refresh = useCallback(async () => {
     try {
-      const [details, roundList] = await Promise.all([
+      const [details, roundList, matchList] = await Promise.all([
         getLeaderboard(leaderboardId),
         getRounds(leaderboardId),
+        getMatches(leaderboardId),
       ]);
       setLeaderboard(details);
       setRounds(roundList);
+      setMatches(matchList);
       saveRecent(details);
       setLoadError(null);
     } catch (err) {
@@ -79,6 +86,8 @@ export default function LeaderboardPage() {
     );
   }
 
+  const isElo = leaderboard.scoringMode === "ELO";
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
       <a
@@ -88,9 +97,14 @@ export default function LeaderboardPage() {
         <ArrowNarrowLeft size={16} />
         All leaderboards
       </a>
-      <h1 className="mb-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-        {leaderboard.name}
-      </h1>
+      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{leaderboard.name}</h1>
+        {isElo && (
+          <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700">
+            Elo · {leaderboard.matchFormat === "TWO_V_TWO" ? "2v2" : "1v1"}
+          </span>
+        )}
+      </div>
 
       <Card className="mb-6 flex items-center justify-between gap-3 !p-3.5 sm:!p-4">
         <span className="min-w-0 truncate text-sm text-gray-500">
@@ -103,7 +117,12 @@ export default function LeaderboardPage() {
       </Card>
 
       <div className="mb-6">
-        <StandingsTable participants={leaderboard.participants} onDelete={handleDeleteParticipant} />
+        <StandingsTable
+          participants={leaderboard.participants}
+          onDelete={handleDeleteParticipant}
+          onSelect={setSelectedParticipant}
+          scoringMode={leaderboard.scoringMode}
+        />
       </div>
 
       <div className="mb-6">
@@ -111,15 +130,34 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="mb-8">
-        <AddRoundForm
-          leaderboardId={leaderboardId}
-          participants={leaderboard.participants}
-          onAdded={refresh}
-        />
+        {isElo ? (
+          <AddMatchForm
+            leaderboardId={leaderboardId}
+            participants={leaderboard.participants}
+            matchFormat={leaderboard.matchFormat}
+            onAdded={refresh}
+          />
+        ) : (
+          <AddRoundForm
+            leaderboardId={leaderboardId}
+            participants={leaderboard.participants}
+            onAdded={refresh}
+          />
+        )}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase">Round history</h2>
-      <RoundHistory rounds={rounds} />
+      <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase">
+        {isElo ? "Match history" : "Round history"}
+      </h2>
+      {isElo ? <MatchHistory matches={matches} /> : <RoundHistory rounds={rounds} />}
+
+      <PlayerCard
+        participant={selectedParticipant}
+        scoringMode={leaderboard.scoringMode}
+        matches={matches}
+        isOpen={Boolean(selectedParticipant)}
+        onOpenChange={(open) => !open && setSelectedParticipant(null)}
+      />
     </div>
   );
 }

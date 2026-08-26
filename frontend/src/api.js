@@ -15,11 +15,11 @@ async function handle(response) {
   return response.json();
 }
 
-export function createLeaderboard(name) {
+export function createLeaderboard(name, scoringMode = "WIN_COUNT", matchFormat = null) {
   return fetch(`${API_BASE}/leaderboards`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, scoringMode, matchFormat }),
   }).then(handle);
 }
 
@@ -52,6 +52,18 @@ export function addRound(leaderboardId, label, results) {
 
 export function getRounds(leaderboardId) {
   return fetch(`${API_BASE}/leaderboards/${leaderboardId}/rounds`, { cache: "no-store" }).then(handle);
+}
+
+export function addMatch(leaderboardId, teamA, teamB, outcome) {
+  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/matches`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ teamA, teamB, outcome }),
+  }).then(handle);
+}
+
+export function getMatches(leaderboardId) {
+  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/matches`, { cache: "no-store" }).then(handle);
 }
 
 export function participantImageUrl(participantId) {

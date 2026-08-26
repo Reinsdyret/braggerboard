@@ -1,6 +1,7 @@
 package no.lars.leaderboard
 
 import no.lars.leaderboard.domain.RoundResultInput
+import no.lars.leaderboard.domain.ScoringMode
 import no.lars.leaderboard.repository.LeaderboardRepository
 import no.lars.leaderboard.repository.ParticipantRepository
 import no.lars.leaderboard.repository.RoundRepository
@@ -27,7 +28,7 @@ class LeaderboardFlowTest {
 
     @Test
     fun `creating rounds accumulates standings correctly`() {
-        val leaderboard = leaderboardRepository.create("Friday Darts")
+        val leaderboard = leaderboardRepository.create("Friday Darts", ScoringMode.WIN_COUNT, null)
         val alice = participantRepository.create(leaderboard.id, "Alice", null)
         val bob = participantRepository.create(leaderboard.id, "Bob", null)
 

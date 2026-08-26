@@ -1,14 +1,65 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trophy01, ChevronRight, AlertCircle } from "@untitledui/icons";
+import { Trophy01, ChevronRight, AlertCircle, TrendUp01, User01, Users01 } from "@untitledui/icons";
 import { createLeaderboard } from "./api.js";
 import { loadRecents } from "./recents.js";
 import Button from "./components/ui/Button.jsx";
 import Card from "./components/ui/Card.jsx";
 import Input from "./components/ui/Input.jsx";
+import { cx } from "./utils/cx.js";
+
+const SCORING_MODES = [
+  {
+    value: "WIN_COUNT",
+    label: "Win count",
+    description: "Track how many times each person won",
+    icon: Trophy01,
+  },
+  {
+    value: "ELO",
+    label: "Elo rating",
+    description: "Rating rises and falls based on who you beat",
+    icon: TrendUp01,
+  },
+];
+
+const MATCH_FORMATS = [
+  { value: "ONE_V_ONE", label: "1 v 1", icon: User01 },
+  { value: "TWO_V_TWO", label: "2 v 2", icon: Users01 },
+];
+
+function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cx(
+        "flex flex-1 items-start gap-3 rounded-xl border p-3.5 text-left transition-colors",
+        selected
+          ? "border-brand-500 bg-brand-50/60 ring-1 ring-brand-500"
+          : "border-gray-200 bg-white hover:border-gray-300",
+      )}
+    >
+      <div
+        className={cx(
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+          selected ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-500",
+        )}
+      >
+        <Icon size={16} />
+      </div>
+      <div className="min-w-0">
+        <p className={cx("text-sm font-semibold", selected ? "text-brand-700" : "text-gray-800")}>{label}</p>
+        {description && <p className="mt-0.5 text-xs text-gray-500">{description}</p>}
+      </div>
+    </button>
+  );
+}
 
 export default function Home() {
   const [name, setName] = useState("");
+  const [scoringMode, setScoringMode] = useState("WIN_COUNT");
+  const [matchFormat, setMatchFormat] = useState("ONE_V_ONE");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [recents, setRecents] = useState([]);
@@ -25,7 +76,11 @@ export default function Home() {
     setSubmitting(true);
     setError(null);
     try {
-      const leaderboard = await createLeaderboard(name.trim());
+      const leaderboard = await createLeaderboard(
+        name.trim(),
+        scoringMode,
+        scoringMode === "ELO" ? matchFormat : null,
+      );
       navigate(`/l/${leaderboard.id}`);
     } catch (err) {
       setError(err.message);
@@ -51,20 +106,58 @@ export default function Home() {
         </div>
 
         <Card>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <label htmlFor="leaderboard-name" className="sr-only">
-              Leaderboard name
-            </label>
-            <Input
-              id="leaderboard-name"
-              type="text"
-              placeholder="Leaderboard name, e.g. Friday Darts"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              error={Boolean(error)}
-              required
-              autoFocus
-            />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <label htmlFor="leaderboard-name" className="sr-only">
+                Leaderboard name
+              </label>
+              <Input
+                id="leaderboard-name"
+                type="text"
+                placeholder="Leaderboard name, e.g. Friday Darts"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                error={Boolean(error)}
+                required
+                autoFocus
+              />
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Scoring</p>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                {SCORING_MODES.map((mode) => (
+                  <OptionCard
+                    key={mode.value}
+                    selected={scoringMode === mode.value}
+                    onSelect={() => setScoringMode(mode.value)}
+                    icon={mode.icon}
+                    label={mode.label}
+                    description={mode.description}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {scoringMode === "ELO" && (
+              <div>
+                <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                  Match format
+                </p>
+                <div className="flex gap-2">
+                  {MATCH_FORMATS.map((format) => (
+                    <OptionCard
+                      key={format.value}
+                      selected={matchFormat === format.value}
+                      onSelect={() => setMatchFormat(format.value)}
+                      icon={format.icon}
+                      label={format.label}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Button type="submit" size="lg" isLoading={submitting} isDisabled={!name.trim()}>
               Create leaderboard
             </Button>

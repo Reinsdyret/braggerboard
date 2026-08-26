@@ -2,6 +2,7 @@ package no.lars.leaderboard.web
 
 import no.lars.leaderboard.domain.Round
 import no.lars.leaderboard.domain.RoundResultInput
+import no.lars.leaderboard.domain.ScoringMode
 import no.lars.leaderboard.repository.RoundRepository
 import no.lars.leaderboard.service.LeaderboardService
 import org.springframework.http.CacheControl
@@ -26,7 +27,8 @@ class RoundController(
     @PostMapping("/api/leaderboards/{leaderboardId}/rounds")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@PathVariable leaderboardId: UUID, @RequestBody request: CreateRoundRequest): Round {
-        leaderboardService.requireExists(leaderboardId)
+        val leaderboard = leaderboardService.requireExists(leaderboardId)
+        require(leaderboard.scoringMode == ScoringMode.WIN_COUNT) { "This leaderboard uses Elo scoring, not rounds" }
         require(request.results.isNotEmpty()) { "A round needs at least one result" }
         require(request.results.all { it.wins >= 0 }) { "Wins must not be negative" }
 

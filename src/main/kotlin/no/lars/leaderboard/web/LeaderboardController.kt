@@ -2,6 +2,8 @@ package no.lars.leaderboard.web
 
 import no.lars.leaderboard.domain.Leaderboard
 import no.lars.leaderboard.domain.LeaderboardDetails
+import no.lars.leaderboard.domain.MatchFormat
+import no.lars.leaderboard.domain.ScoringMode
 import no.lars.leaderboard.service.LeaderboardService
 import org.springframework.http.CacheControl
 import org.springframework.http.HttpStatus
@@ -14,7 +16,11 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
-data class CreateLeaderboardRequest(val name: String)
+data class CreateLeaderboardRequest(
+    val name: String,
+    val scoringMode: ScoringMode = ScoringMode.WIN_COUNT,
+    val matchFormat: MatchFormat? = null,
+)
 
 @RestController
 class LeaderboardController(private val leaderboardService: LeaderboardService) {
@@ -22,7 +28,7 @@ class LeaderboardController(private val leaderboardService: LeaderboardService) 
     @PostMapping("/api/leaderboards")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody request: CreateLeaderboardRequest): Leaderboard =
-        leaderboardService.create(request.name)
+        leaderboardService.create(request.name, request.scoringMode, request.matchFormat)
 
     @GetMapping("/api/leaderboards/{leaderboardId}")
     fun get(@PathVariable leaderboardId: UUID): ResponseEntity<LeaderboardDetails> =
