@@ -38,13 +38,13 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={toast.id}
-              className="animate-toast-in pointer-events-auto flex w-full max-w-sm items-start gap-2.5 rounded-xl border border-gray-200 bg-white p-4 shadow-[var(--shadow-popover)]"
+              className="animate-toast-in pointer-events-auto flex w-full max-w-sm items-start gap-2.5 rounded-xl border border-gray-200 bg-white p-4 shadow-[var(--shadow-popover)] dark:border-gray-700 dark:bg-gray-800"
             >
               <Icon size={20} className={cx("mt-0.5 shrink-0", className)} />
-              <p className="flex-1 text-sm font-medium text-gray-800">{toast.message}</p>
+              <p className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200">{toast.message}</p>
               <button
                 onClick={() => dismiss(toast.id)}
-                className="shrink-0 rounded-md p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                className="shrink-0 rounded-md p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
                 aria-label="Dismiss"
               >
                 <XClose size={16} />

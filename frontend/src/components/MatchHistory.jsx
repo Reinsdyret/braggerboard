@@ -42,17 +42,17 @@ export default function MatchHistory({ matches, onEdit, onDelete }) {
         {matches.map((match) => (
           <li
             key={match.id}
-            className="rounded-2xl border border-gray-200 bg-white p-4 shadow-[var(--shadow-card)] sm:p-5"
+            className="rounded-2xl border border-gray-200 bg-white p-4 shadow-[var(--shadow-card)] sm:p-5 dark:border-gray-700 dark:bg-gray-800"
           >
             <div className="mb-2.5 flex items-center justify-between gap-3">
               <Badge color={OUTCOME_COLOR[match.outcome]}>{OUTCOME_LABEL[match.outcome]}</Badge>
               <div className="flex shrink-0 items-center gap-1">
-                <span className="mr-1 text-xs text-gray-400">{formatDate(match.createdAt)}</span>
+                <span className="mr-1 text-xs text-gray-400 dark:text-gray-500">{formatDate(match.createdAt)}</span>
                 <button
                   type="button"
                   onClick={() => onEdit(match)}
                   aria-label="Edit match"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
                 >
                   <Pencil01 size={14} />
                 </button>
@@ -60,18 +60,30 @@ export default function MatchHistory({ matches, onEdit, onDelete }) {
                   type="button"
                   onClick={() => setPendingDelete(match)}
                   aria-label="Delete match"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500 dark:text-gray-600 dark:hover:bg-red-400/10 dark:hover:text-red-400"
                 >
                   <Trash02 size={14} />
                 </button>
               </div>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <span className={match.outcome === "TEAM_A" ? "font-semibold text-gray-900" : "text-gray-600"}>
+              <span
+                className={
+                  match.outcome === "TEAM_A"
+                    ? "font-semibold text-gray-900 dark:text-gray-100"
+                    : "text-gray-600 dark:text-gray-400"
+                }
+              >
                 {teamNames(match.teamA)}
               </span>
-              <span className="text-xs font-semibold text-gray-400">vs</span>
-              <span className={match.outcome === "TEAM_B" ? "font-semibold text-gray-900" : "text-gray-600"}>
+              <span className="text-xs font-semibold text-gray-400 dark:text-gray-500">vs</span>
+              <span
+                className={
+                  match.outcome === "TEAM_B"
+                    ? "font-semibold text-gray-900 dark:text-gray-100"
+                    : "text-gray-600 dark:text-gray-400"
+                }
+              >
                 {teamNames(match.teamB)}
               </span>
             </div>

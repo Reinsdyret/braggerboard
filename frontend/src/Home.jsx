@@ -36,21 +36,28 @@ function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
       className={cx(
         "flex flex-1 items-start gap-3 rounded-xl border p-3.5 text-left transition-colors",
         selected
-          ? "border-brand-500 bg-brand-50/60 ring-1 ring-brand-500"
-          : "border-gray-200 bg-white hover:border-gray-300",
+          ? "border-brand-500 bg-brand-50/60 ring-1 ring-brand-500 dark:bg-brand-400/10"
+          : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600",
       )}
     >
       <div
         className={cx(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          selected ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-500",
+          selected ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400",
         )}
       >
         <Icon size={16} />
       </div>
       <div className="min-w-0">
-        <p className={cx("text-sm font-semibold", selected ? "text-brand-700" : "text-gray-800")}>{label}</p>
-        {description && <p className="mt-0.5 text-xs text-gray-500">{description}</p>}
+        <p
+          className={cx(
+            "text-sm font-semibold",
+            selected ? "text-brand-700 dark:text-brand-300" : "text-gray-800 dark:text-gray-200",
+          )}
+        >
+          {label}
+        </p>
+        {description && <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{description}</p>}
       </div>
     </button>
   );
@@ -99,8 +106,10 @@ export default function Home() {
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-600/25">
             <Trophy01 size={24} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Leaderboard</h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100">
+            Leaderboard
+          </h1>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Create a leaderboard, share the link, track who's winning.
           </p>
         </div>
@@ -124,7 +133,7 @@ export default function Home() {
             </div>
 
             <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Scoring</p>
+              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">Scoring</p>
               <div className="flex flex-col gap-2 sm:flex-row">
                 {SCORING_MODES.map((mode) => (
                   <OptionCard
@@ -141,7 +150,7 @@ export default function Home() {
 
             {scoringMode === "ELO" && (
               <div>
-                <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                   Match format
                 </p>
                 <div className="flex gap-2">
@@ -172,7 +181,7 @@ export default function Home() {
 
         {recents.length > 0 && (
           <div className="mt-8">
-            <h2 className="mb-2 px-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+            <h2 className="mb-2 px-1 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
               Your recent leaderboards
             </h2>
             <div className="flex flex-col gap-2">
@@ -180,13 +189,18 @@ export default function Home() {
                 <a
                   key={r.id}
                   href={`#/l/${r.id}`}
-                  className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-[var(--shadow-card)] transition-colors hover:border-brand-300 hover:bg-brand-50/40"
+                  className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-[var(--shadow-card)] transition-colors hover:border-brand-300 hover:bg-brand-50/40 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-brand-500 dark:hover:bg-brand-400/10"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 group-hover:bg-brand-100 group-hover:text-brand-600">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 group-hover:bg-brand-100 group-hover:text-brand-600 dark:bg-gray-700 dark:text-gray-400 dark:group-hover:bg-brand-400/20 dark:group-hover:text-brand-400">
                     <Trophy01 size={16} />
                   </div>
-                  <span className="flex-1 truncate text-sm font-medium text-gray-800">{r.name}</span>
-                  <ChevronRight size={16} className="shrink-0 text-gray-300 group-hover:text-brand-400" />
+                  <span className="flex-1 truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                    {r.name}
+                  </span>
+                  <ChevronRight
+                    size={16}
+                    className="shrink-0 text-gray-300 group-hover:text-brand-400 dark:text-gray-600"
+                  />
                 </a>
               ))}
             </div>

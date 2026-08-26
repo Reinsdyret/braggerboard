@@ -4,7 +4,7 @@ export default function Card({ className, children, ...props }) {
   return (
     <div
       className={cx(
-        "rounded-2xl border border-gray-200 bg-white p-5 shadow-[var(--shadow-card)] sm:p-6",
+        "rounded-2xl border border-gray-200 bg-white p-5 shadow-[var(--shadow-card)] sm:p-6 dark:border-gray-700 dark:bg-gray-800",
         className,
       )}
       {...props}

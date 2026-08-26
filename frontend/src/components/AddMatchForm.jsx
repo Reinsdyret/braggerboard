@@ -52,9 +52,9 @@ export default function AddMatchForm({ leaderboardId, participants, matchFormat,
       <Card>
         <div className="mb-1 flex items-center gap-2">
           <Zap size={18} className="text-brand-600" />
-          <h3 className="text-sm font-semibold text-gray-700">Add match</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Add match</h3>
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Add at least {teamSize * 2} participants to record a match.
         </p>
       </Card>
@@ -84,7 +84,7 @@ export default function AddMatchForm({ leaderboardId, participants, matchFormat,
         </Button>
 
         {error && (
-          <p className="flex items-center gap-1.5 text-sm text-red-600">
+          <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
             <AlertCircle size={16} className="shrink-0" />
             {error}
           </p>

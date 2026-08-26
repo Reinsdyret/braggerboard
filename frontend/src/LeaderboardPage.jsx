@@ -76,10 +76,10 @@ export default function LeaderboardPage() {
   if (loadError && !leaderboard) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center sm:px-6">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500 dark:bg-red-400/10">
           <AlertCircle size={22} />
         </div>
-        <p className="mb-4 text-sm text-gray-600">{loadError}</p>
+        <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">{loadError}</p>
         <a href="#/" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
           ← Back home
         </a>
@@ -104,22 +104,24 @@ export default function LeaderboardPage() {
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
       <a
         href="#/"
-        className="mb-3 inline-flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-800"
+        className="mb-3 inline-flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
       >
         <ArrowNarrowLeft size={16} />
         All leaderboards
       </a>
       <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{leaderboard.name}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100">
+          {leaderboard.name}
+        </h1>
         {isElo && (
-          <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700">
+          <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-400/10 dark:text-brand-300">
             Elo · {leaderboard.matchFormat === "TWO_V_TWO" ? "2v2" : "1v1"}
           </span>
         )}
       </div>
 
       <Card className="mb-6 flex items-center justify-between gap-3 !p-3.5 sm:!p-4">
-        <span className="min-w-0 truncate text-sm text-gray-500">
+        <span className="min-w-0 truncate text-sm text-gray-500 dark:text-gray-400">
           <span className="sm:hidden">Share this leaderboard</span>
           <span className="hidden sm:inline">Share this link so others can view and update this leaderboard</span>
         </span>
@@ -159,7 +161,7 @@ export default function LeaderboardPage() {
         )}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase">
+      <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
         {isElo ? "Match history" : "Round history"}
       </h2>
       {isElo ? (

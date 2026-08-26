@@ -1,13 +1,24 @@
+import { useIsDarkMode } from "../utils/useIsDarkMode.js";
+
 const WIDTH = 300;
 const HEIGHT = 90;
 const PAD_Y = 10;
-const LINE_COLOR = "#6d4fe0";
-const UP_COLOR = "#16a34a";
-const DOWN_COLOR = "#dc2626";
+
+const COLORS = {
+  light: { line: "#6d4fe0", up: "#16a34a", down: "#dc2626" },
+  dark: { line: "#a78bfa", up: "#4ade80", down: "#f87171" },
+};
 
 export default function RatingHistoryChart({ history, startingRating = 1000 }) {
+  const isDark = useIsDarkMode();
+  const { line: lineColor, up: upColor, down: downColor } = isDark ? COLORS.dark : COLORS.light;
+
   if (history.length === 0) {
-    return <p className="text-center text-sm text-gray-500">Play a match to start tracking rating history.</p>;
+    return (
+      <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+        Play a match to start tracking rating history.
+      </p>
+    );
   }
 
   const points = [{ rating: startingRating }, ...history];
@@ -26,7 +37,7 @@ export default function RatingHistoryChart({ history, startingRating = 1000 }) {
   const areaPath = `${linePath} L${WIDTH},${HEIGHT} L0,${HEIGHT} Z`;
   const [lastX, lastY] = coords[coords.length - 1];
   const finalRating = history[history.length - 1].rating;
-  const trendColor = finalRating >= startingRating ? UP_COLOR : DOWN_COLOR;
+  const trendColor = finalRating >= startingRating ? upColor : downColor;
 
   return (
     <div>
@@ -39,15 +50,15 @@ export default function RatingHistoryChart({ history, startingRating = 1000 }) {
       >
         <defs>
           <linearGradient id="ratingFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={LINE_COLOR} stopOpacity="0.2" />
-            <stop offset="100%" stopColor={LINE_COLOR} stopOpacity="0" />
+            <stop offset="0%" stopColor={lineColor} stopOpacity="0.2" />
+            <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
           </linearGradient>
         </defs>
         <path d={areaPath} fill="url(#ratingFill)" stroke="none" />
         <path
           d={linePath}
           fill="none"
-          stroke={LINE_COLOR}
+          stroke={lineColor}
           strokeWidth="2"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -55,7 +66,7 @@ export default function RatingHistoryChart({ history, startingRating = 1000 }) {
         />
         <circle cx={lastX} cy={lastY} r="3.5" fill={trendColor} />
       </svg>
-      <div className="mt-1 flex justify-between text-xs text-gray-400">
+      <div className="mt-1 flex justify-between text-xs text-gray-400 dark:text-gray-500">
         <span>Low {min}</span>
         <span>High {max}</span>
       </div>

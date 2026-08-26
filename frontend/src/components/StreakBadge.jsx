@@ -11,7 +11,9 @@ export default function StreakBadge({ streak, size = "md" }) {
     <span
       className={cx(
         "inline-flex shrink-0 items-center rounded-full font-semibold",
-        isWin ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600",
+        isWin
+          ? "bg-green-100 text-green-700 dark:bg-green-400/10 dark:text-green-400"
+          : "bg-red-100 text-red-600 dark:bg-red-400/10 dark:text-red-400",
         sizeClass,
       )}
     >

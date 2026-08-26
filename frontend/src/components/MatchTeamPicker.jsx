@@ -32,7 +32,7 @@ export default function MatchTeamPicker({
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-1 flex-col gap-2">
-          <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">Team A</p>
+          <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">Team A</p>
           {teamA.map((value, i) => (
             <Select key={i} value={value} onChange={(e) => updateSlot(onTeamAChange, teamA, i, e.target.value)}>
               <option value="">Choose participant…</option>
@@ -45,10 +45,12 @@ export default function MatchTeamPicker({
           ))}
         </div>
 
-        <span className="hidden self-center text-xs font-semibold text-gray-400 sm:block">VS</span>
+        <span className="hidden self-center text-xs font-semibold text-gray-400 sm:block dark:text-gray-500">
+          VS
+        </span>
 
         <div className="flex flex-1 flex-col gap-2">
-          <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase">Team B</p>
+          <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">Team B</p>
           {teamB.map((value, i) => (
             <Select key={i} value={value} onChange={(e) => updateSlot(onTeamBChange, teamB, i, e.target.value)}>
               <option value="">Choose participant…</option>
@@ -63,7 +65,7 @@ export default function MatchTeamPicker({
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Winner</p>
+        <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">Winner</p>
         <div className="grid grid-cols-3 gap-2">
           {OUTCOMES.map((opt) => (
             <button
@@ -73,8 +75,8 @@ export default function MatchTeamPicker({
               className={cx(
                 "rounded-lg border py-2 text-sm font-semibold transition-colors",
                 outcome === opt.value
-                  ? "border-brand-500 bg-brand-50 text-brand-700"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300",
+                  ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-400/10 dark:text-brand-300"
+                  : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-600",
               )}
             >
               {opt.label}
