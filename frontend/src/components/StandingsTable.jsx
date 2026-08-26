@@ -4,6 +4,8 @@ import Avatar from "./Avatar.jsx";
 import Badge from "./ui/Badge.jsx";
 import ConfirmDialog from "./ui/ConfirmDialog.jsx";
 import EmptyState from "./ui/EmptyState.jsx";
+import StreakBadge from "./StreakBadge.jsx";
+import { computeStreak } from "../utils/streak.js";
 
 const RANK_COLOR = { 1: "gold", 2: "silver", 3: "bronze" };
 
@@ -15,7 +17,7 @@ function RankBadge({ rank }) {
   return <span className="w-6 text-center text-sm font-semibold text-gray-400">{rank}</span>;
 }
 
-export default function StandingsTable({ participants, onDelete, onSelect, scoringMode = "WIN_COUNT" }) {
+export default function StandingsTable({ participants, onDelete, onSelect, scoringMode = "WIN_COUNT", matches = [] }) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const historyNoun = scoringMode === "ELO" ? "match" : "round";
 
@@ -35,6 +37,7 @@ export default function StandingsTable({ participants, onDelete, onSelect, scori
         {participants.map((p, index) => {
           const rank = index + 1;
           const score = scoringMode === "ELO" ? p.rating : p.totalWins;
+          const streak = scoringMode === "ELO" ? computeStreak(p.id, matches) : null;
           return (
             <li key={p.id} className="flex items-center">
               <button
@@ -46,6 +49,7 @@ export default function StandingsTable({ participants, onDelete, onSelect, scori
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar participant={p} rankColor={RANK_COLOR[rank]} />
                   <span className="truncate text-sm font-medium text-gray-900">{p.name}</span>
+                  <StreakBadge streak={streak} size="sm" />
                 </div>
                 <span className="text-sm font-bold text-brand-600">{score}</span>
               </button>

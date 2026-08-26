@@ -1,4 +1,4 @@
-function outcomeFor(myTeam, outcome) {
+export function outcomeFor(myTeam, outcome) {
   if (outcome === "DRAW") return "draw";
   const won = (myTeam === "A" && outcome === "TEAM_A") || (myTeam === "B" && outcome === "TEAM_B");
   return won ? "win" : "loss";

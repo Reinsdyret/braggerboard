@@ -134,6 +134,7 @@ export default function LeaderboardPage() {
           onDelete={handleDeleteParticipant}
           onSelect={setSelectedParticipant}
           scoringMode={leaderboard.scoringMode}
+          matches={matches}
         />
       </div>
 

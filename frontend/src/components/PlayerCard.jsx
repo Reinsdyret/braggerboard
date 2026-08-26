@@ -2,8 +2,10 @@ import { ModalOverlay, Modal, Dialog, Heading } from "react-aria-components";
 import { XClose, TrendUp01, TrendDown01, Users01 } from "@untitledui/icons";
 import Avatar from "./Avatar.jsx";
 import RatingHistoryChart from "./RatingHistoryChart.jsx";
+import StreakBadge from "./StreakBadge.jsx";
 import { computeHeadToHead } from "../utils/headToHead.js";
 import { computeRatingHistory } from "../utils/ratingHistory.js";
+import { computeStreak } from "../utils/streak.js";
 import { cx } from "../utils/cx.js";
 
 function StatBox({ label, value }) {
@@ -47,6 +49,7 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
   const stats = scoringMode === "ELO" ? computeHeadToHead(participant.id, matches) : null;
   const opponents = stats?.opponents ?? [];
   const ratingHistory = scoringMode === "ELO" ? computeRatingHistory(participant.id, matches) : [];
+  const streak = scoringMode === "ELO" ? computeStreak(participant.id, matches) : null;
 
   // Only frame it as "best vs toughest" when there's an actual gap between the top and bottom net
   // score - otherwise that framing is a contradiction, since it labels the exact same record as
@@ -82,9 +85,12 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                 <Heading slot="title" className="mt-3 text-lg font-bold text-gray-900">
                   {participant.name}
                 </Heading>
-                <p className="text-sm text-gray-500">
-                  {scoringMode === "ELO" ? `${participant.rating} rating` : `${participant.totalWins} wins`}
-                </p>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="text-sm text-gray-500">
+                    {scoringMode === "ELO" ? `${participant.rating} rating` : `${participant.totalWins} wins`}
+                  </p>
+                  <StreakBadge streak={streak} />
+                </div>
               </div>
 
               {scoringMode === "ELO" && stats && (
