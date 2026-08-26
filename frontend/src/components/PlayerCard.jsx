@@ -1,7 +1,9 @@
 import { ModalOverlay, Modal, Dialog, Heading } from "react-aria-components";
 import { XClose, TrendUp01, TrendDown01, Users01 } from "@untitledui/icons";
 import Avatar from "./Avatar.jsx";
+import RatingHistoryChart from "./RatingHistoryChart.jsx";
 import { computeHeadToHead } from "../utils/headToHead.js";
+import { computeRatingHistory } from "../utils/ratingHistory.js";
 import { cx } from "../utils/cx.js";
 
 function StatBox({ label, value }) {
@@ -44,6 +46,7 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
 
   const stats = scoringMode === "ELO" ? computeHeadToHead(participant.id, matches) : null;
   const opponents = stats?.opponents ?? [];
+  const ratingHistory = scoringMode === "ELO" ? computeRatingHistory(participant.id, matches) : [];
 
   // Only frame it as "best vs toughest" when there's an actual gap between the top and bottom net
   // score - otherwise that framing is a contradiction, since it labels the exact same record as
@@ -62,7 +65,7 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
       isDismissable
       className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-gray-900/40 backdrop-blur-[2px] sm:items-center sm:p-4"
     >
-      <Modal className="animate-modal-in relative w-full max-w-sm rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl">
+      <Modal className="animate-modal-in relative max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl">
         <Dialog className="outline-none">
           {({ close }) => (
             <>
@@ -91,6 +94,13 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                     <StatBox label="Won" value={stats.wins} />
                     <StatBox label="Lost" value={stats.losses} />
                     {stats.draws > 0 && <StatBox label="Drawn" value={stats.draws} />}
+                  </div>
+
+                  <div className="mb-5">
+                    <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                      Rating history
+                    </p>
+                    <RatingHistoryChart history={ratingHistory} />
                   </div>
 
                   {opponents.length === 0 && (
