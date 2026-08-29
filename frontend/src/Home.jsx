@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trophy01, ChevronRight, AlertCircle, TrendUp01, User01, Users01 } from "@untitledui/icons";
+import { MAX_TEAM_SIZE } from "./constants.js";
 import { createLeaderboard } from "./api.js";
 import { loadRecents } from "./recents.js";
 import Button from "./components/ui/Button.jsx";
@@ -23,10 +24,10 @@ const SCORING_MODES = [
   },
 ];
 
-const MATCH_FORMATS = [
-  { value: "ONE_V_ONE", label: "1 v 1", icon: User01 },
-  { value: "TWO_V_TWO", label: "2 v 2", icon: Users01 },
-];
+const TEAM_SIZES = Array.from({ length: MAX_TEAM_SIZE }, (_, i) => {
+  const size = i + 1;
+  return { value: size, label: `${size} v ${size}`, icon: size === 1 ? User01 : Users01 };
+});
 
 function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
   return (
@@ -66,7 +67,7 @@ function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
 export default function Home() {
   const [name, setName] = useState("");
   const [scoringMode, setScoringMode] = useState("WIN_COUNT");
-  const [matchFormat, setMatchFormat] = useState("ONE_V_ONE");
+  const [teamSize, setTeamSize] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [recents, setRecents] = useState([]);
@@ -86,7 +87,7 @@ export default function Home() {
       const leaderboard = await createLeaderboard(
         name.trim(),
         scoringMode,
-        scoringMode === "ELO" ? matchFormat : null,
+        scoringMode === "ELO" ? teamSize : null,
       );
       navigate(`/l/${leaderboard.id}`);
     } catch (err) {
@@ -151,14 +152,14 @@ export default function Home() {
             {scoringMode === "ELO" && (
               <div>
                 <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                  Match format
+                  Team size
                 </p>
-                <div className="flex gap-2">
-                  {MATCH_FORMATS.map((format) => (
+                <div className="grid grid-cols-2 gap-2">
+                  {TEAM_SIZES.map((format) => (
                     <OptionCard
                       key={format.value}
-                      selected={matchFormat === format.value}
-                      onSelect={() => setMatchFormat(format.value)}
+                      selected={teamSize === format.value}
+                      onSelect={() => setTeamSize(format.value)}
                       icon={format.icon}
                       label={format.label}
                     />

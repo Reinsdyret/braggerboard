@@ -64,10 +64,10 @@ class MatchController(
 
     private fun validated(leaderboard: Leaderboard, request: CreateMatchRequest): MatchInput {
         require(leaderboard.scoringMode == ScoringMode.ELO) { "This leaderboard uses win-count scoring, not matches" }
-        val format = leaderboard.matchFormat!!
+        val teamSize = leaderboard.teamSize!!
 
-        require(request.teamA.size == format.teamSize && request.teamB.size == format.teamSize) {
-            "Each team needs exactly ${format.teamSize} participant(s) for this leaderboard's format"
+        require(request.teamA.size == teamSize && request.teamB.size == teamSize) {
+            "Each team needs exactly $teamSize participant(s) for this leaderboard's format"
         }
         val allIds = request.teamA + request.teamB
         require(allIds.toSet().size == allIds.size) { "A participant can't appear more than once in a match" }

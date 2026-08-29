@@ -6,10 +6,7 @@ import Button from "./ui/Button.jsx";
 import Card from "./ui/Card.jsx";
 import MatchTeamPicker from "./MatchTeamPicker.jsx";
 
-const TEAM_SIZE = { ONE_V_ONE: 1, TWO_V_TWO: 2 };
-
-export default function AddMatchForm({ leaderboardId, participants, matchFormat, onAdded }) {
-  const teamSize = TEAM_SIZE[matchFormat] ?? 1;
+export default function AddMatchForm({ leaderboardId, participants, teamSize, onAdded }) {
   const [teamA, setTeamA] = useState(() => Array(teamSize).fill(""));
   const [teamB, setTeamB] = useState(() => Array(teamSize).fill(""));
   const [outcome, setOutcome] = useState("TEAM_A");

@@ -2,7 +2,7 @@ package no.lars.leaderboard.service
 
 import no.lars.leaderboard.domain.Leaderboard
 import no.lars.leaderboard.domain.LeaderboardDetails
-import no.lars.leaderboard.domain.MatchFormat
+import no.lars.leaderboard.domain.MAX_TEAM_SIZE
 import no.lars.leaderboard.domain.ParticipantStanding
 import no.lars.leaderboard.domain.ScoringMode
 import no.lars.leaderboard.repository.LeaderboardRepository
@@ -21,13 +21,16 @@ class LeaderboardService(
     private val matchRepository: MatchRepository,
 ) {
 
-    fun create(name: String, scoringMode: ScoringMode, matchFormat: MatchFormat?): Leaderboard {
+    fun create(name: String, scoringMode: ScoringMode, teamSize: Int?): Leaderboard {
         require(name.isNotBlank()) { "Leaderboard name must not be blank" }
         require(name.length <= 100) { "Leaderboard name must be 100 characters or fewer" }
-        require(scoringMode != ScoringMode.ELO || matchFormat != null) {
-            "An Elo leaderboard needs a match format"
+        require(scoringMode != ScoringMode.ELO || teamSize != null) {
+            "An Elo leaderboard needs a team size"
         }
-        return leaderboardRepository.create(name.trim(), scoringMode, if (scoringMode == ScoringMode.ELO) matchFormat else null)
+        require(teamSize == null || teamSize in 1..MAX_TEAM_SIZE) {
+            "Team size must be between 1 and $MAX_TEAM_SIZE"
+        }
+        return leaderboardRepository.create(name.trim(), scoringMode, if (scoringMode == ScoringMode.ELO) teamSize else null)
     }
 
     fun getDetails(leaderboardId: UUID): LeaderboardDetails {
@@ -73,7 +76,7 @@ class LeaderboardService(
             id = leaderboard.id,
             name = leaderboard.name,
             scoringMode = leaderboard.scoringMode,
-            matchFormat = leaderboard.matchFormat,
+            teamSize = leaderboard.teamSize,
             createdAt = leaderboard.createdAt,
             participants = standings,
         )

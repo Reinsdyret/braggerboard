@@ -2,7 +2,6 @@ package no.lars.leaderboard.web
 
 import no.lars.leaderboard.domain.Leaderboard
 import no.lars.leaderboard.domain.LeaderboardDetails
-import no.lars.leaderboard.domain.MatchFormat
 import no.lars.leaderboard.domain.ScoringMode
 import no.lars.leaderboard.service.LeaderboardService
 import org.springframework.http.CacheControl
@@ -19,7 +18,7 @@ import java.util.UUID
 data class CreateLeaderboardRequest(
     val name: String,
     val scoringMode: ScoringMode = ScoringMode.WIN_COUNT,
-    val matchFormat: MatchFormat? = null,
+    val teamSize: Int? = null,
 )
 
 @RestController
@@ -28,7 +27,7 @@ class LeaderboardController(private val leaderboardService: LeaderboardService) 
     @PostMapping("/api/leaderboards")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody request: CreateLeaderboardRequest): Leaderboard =
-        leaderboardService.create(request.name, request.scoringMode, request.matchFormat)
+        leaderboardService.create(request.name, request.scoringMode, request.teamSize)
 
     @GetMapping("/api/leaderboards/{leaderboardId}")
     fun get(@PathVariable leaderboardId: UUID): ResponseEntity<LeaderboardDetails> =

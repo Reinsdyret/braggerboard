@@ -1,6 +1,5 @@
 package no.lars.leaderboard
 
-import no.lars.leaderboard.domain.MatchFormat
 import no.lars.leaderboard.domain.MatchInput
 import no.lars.leaderboard.domain.MatchOutcome
 import no.lars.leaderboard.domain.ScoringMode
@@ -30,7 +29,7 @@ class EloLeaderboardFlowTest {
 
     @Test
     fun `1v1 elo leaderboard ranks winner above loser after a match`() {
-        val leaderboard = leaderboardRepository.create("Chess Club", ScoringMode.ELO, MatchFormat.ONE_V_ONE)
+        val leaderboard = leaderboardRepository.create("Chess Club", ScoringMode.ELO, 1)
         val alice = participantRepository.create(leaderboard.id, "Alice", null)
         val bob = participantRepository.create(leaderboard.id, "Bob", null)
 
@@ -47,7 +46,7 @@ class EloLeaderboardFlowTest {
 
     @Test
     fun `2v2 elo leaderboard applies the team delta to both teammates`() {
-        val leaderboard = leaderboardRepository.create("Foosball", ScoringMode.ELO, MatchFormat.TWO_V_TWO)
+        val leaderboard = leaderboardRepository.create("Foosball", ScoringMode.ELO, 2)
         val p1 = participantRepository.create(leaderboard.id, "P1", null)
         val p2 = participantRepository.create(leaderboard.id, "P2", null)
         val p3 = participantRepository.create(leaderboard.id, "P3", null)
@@ -69,7 +68,7 @@ class EloLeaderboardFlowTest {
 
     @Test
     fun `editing a match's outcome recomputes ratings from the corrected result`() {
-        val leaderboard = leaderboardRepository.create("Chess Club 2", ScoringMode.ELO, MatchFormat.ONE_V_ONE)
+        val leaderboard = leaderboardRepository.create("Chess Club 2", ScoringMode.ELO, 1)
         val alice = participantRepository.create(leaderboard.id, "Alice", null)
         val bob = participantRepository.create(leaderboard.id, "Bob", null)
 
@@ -89,8 +88,26 @@ class EloLeaderboardFlowTest {
     }
 
     @Test
+    fun `4v4 elo leaderboard applies the team delta to all four teammates`() {
+        val leaderboard = leaderboardRepository.create("Big Team Sport", ScoringMode.ELO, 4)
+        val teamA = (1..4).map { participantRepository.create(leaderboard.id, "A$it", null) }
+        val teamB = (1..4).map { participantRepository.create(leaderboard.id, "B$it", null) }
+
+        matchRepository.create(
+            leaderboard.id,
+            MatchInput(teamA.map { it.id }, teamB.map { it.id }, MatchOutcome.TEAM_A),
+        )
+
+        val details = leaderboardService.getDetails(leaderboard.id)
+        val ratingsByName = details.participants.associate { it.name to it.rating }
+
+        teamA.forEach { assertThat(ratingsByName[it.name]).isEqualTo(1016) }
+        teamB.forEach { assertThat(ratingsByName[it.name]).isEqualTo(984) }
+    }
+
+    @Test
     fun `deleting a match reverts ratings as if it never happened`() {
-        val leaderboard = leaderboardRepository.create("Chess Club 3", ScoringMode.ELO, MatchFormat.ONE_V_ONE)
+        val leaderboard = leaderboardRepository.create("Chess Club 3", ScoringMode.ELO, 1)
         val alice = participantRepository.create(leaderboard.id, "Alice", null)
         val bob = participantRepository.create(leaderboard.id, "Bob", null)
 
