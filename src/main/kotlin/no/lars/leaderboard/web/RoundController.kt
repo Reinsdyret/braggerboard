@@ -3,6 +3,7 @@ package no.lars.leaderboard.web
 import no.lars.leaderboard.domain.Round
 import no.lars.leaderboard.domain.RoundResultInput
 import no.lars.leaderboard.domain.ScoringMode
+import no.lars.leaderboard.repository.ParticipantRepository
 import no.lars.leaderboard.repository.RoundRepository
 import no.lars.leaderboard.service.LeaderboardService
 import org.springframework.http.CacheControl
@@ -21,6 +22,7 @@ data class CreateRoundRequest(val label: String?, val results: List<RoundResultI
 @RestController
 class RoundController(
     private val roundRepository: RoundRepository,
+    private val participantRepository: ParticipantRepository,
     private val leaderboardService: LeaderboardService,
 ) {
 
@@ -31,6 +33,12 @@ class RoundController(
         require(leaderboard.scoringMode == ScoringMode.WIN_COUNT) { "This leaderboard uses Elo scoring, not rounds" }
         require(request.results.isNotEmpty()) { "A round needs at least one result" }
         require(request.results.all { it.wins >= 0 }) { "Wins must not be negative" }
+        require((request.label?.length ?: 0) <= 100) { "Round label must be 100 characters or fewer" }
+
+        val knownIds = participantRepository.findByLeaderboardId(leaderboardId).map { it.id }.toSet()
+        require(request.results.all { it.participantId in knownIds }) {
+            "All participants must belong to this leaderboard"
+        }
 
         return roundRepository.create(leaderboardId, request.label?.trim()?.ifBlank { null }, request.results)
     }

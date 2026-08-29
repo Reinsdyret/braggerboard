@@ -23,6 +23,7 @@ class LeaderboardService(
 
     fun create(name: String, scoringMode: ScoringMode, matchFormat: MatchFormat?): Leaderboard {
         require(name.isNotBlank()) { "Leaderboard name must not be blank" }
+        require(name.length <= 100) { "Leaderboard name must be 100 characters or fewer" }
         require(scoringMode != ScoringMode.ELO || matchFormat != null) {
             "An Elo leaderboard needs a match format"
         }

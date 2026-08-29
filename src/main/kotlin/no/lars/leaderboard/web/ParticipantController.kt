@@ -3,6 +3,7 @@ package no.lars.leaderboard.web
 import no.lars.leaderboard.domain.Participant
 import no.lars.leaderboard.domain.ParticipantImage
 import no.lars.leaderboard.repository.ParticipantRepository
+import no.lars.leaderboard.service.ImageSniffer
 import no.lars.leaderboard.service.LeaderboardService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -36,11 +37,14 @@ class ParticipantController(
         @RequestParam(required = false) image: MultipartFile?,
     ): Participant {
         require(name.isNotBlank()) { "Participant name must not be blank" }
+        require(name.length <= 100) { "Participant name must be 100 characters or fewer" }
         leaderboardService.requireExists(leaderboardId)
 
         val participantImage = image?.takeIf { !it.isEmpty }?.let {
-            require(it.contentType?.startsWith("image/") == true) { "Uploaded file must be an image" }
-            ParticipantImage(data = it.bytes, contentType = it.contentType!!)
+            val bytes = it.bytes
+            val detectedType = ImageSniffer.detect(bytes)
+                ?: throw IllegalArgumentException("Uploaded file must be a PNG, JPEG, GIF, or WebP image")
+            ParticipantImage(data = bytes, contentType = detectedType)
         }
 
         return participantRepository.create(leaderboardId, name.trim(), participantImage)
