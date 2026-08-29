@@ -17,25 +17,22 @@ class LeaderboardRepository(private val jdbcTemplate: JdbcTemplate) {
             id = UUID.fromString(rs.getString("id")),
             name = rs.getString("name"),
             scoringMode = ScoringMode.valueOf(rs.getString("scoring_mode")),
-            teamSize = rs.getObject("team_size") as Int?,
             createdAt = rs.getTimestamp("created_at").toInstant(),
         )
     }
 
-    fun create(name: String, scoringMode: ScoringMode, teamSize: Int?, adminPasswordHash: String): Leaderboard {
+    fun create(name: String, scoringMode: ScoringMode, adminPasswordHash: String): Leaderboard {
         val leaderboard = Leaderboard(
             id = UUID.randomUUID(),
             name = name,
             scoringMode = scoringMode,
-            teamSize = teamSize,
             createdAt = Instant.now(),
         )
         jdbcTemplate.update(
-            "INSERT INTO leaderboard (id, name, scoring_mode, team_size, created_at, admin_password_hash) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO leaderboard (id, name, scoring_mode, created_at, admin_password_hash) VALUES (?, ?, ?, ?, ?)",
             leaderboard.id,
             leaderboard.name,
             leaderboard.scoringMode.name,
-            leaderboard.teamSize,
             Timestamp.from(leaderboard.createdAt),
             adminPasswordHash,
         )
@@ -44,7 +41,7 @@ class LeaderboardRepository(private val jdbcTemplate: JdbcTemplate) {
 
     fun findById(id: UUID): Leaderboard? =
         jdbcTemplate.query(
-            "SELECT id, name, scoring_mode, team_size, created_at FROM leaderboard WHERE id = ?",
+            "SELECT id, name, scoring_mode, created_at FROM leaderboard WHERE id = ?",
             rowMapper,
             id,
         ).firstOrNull()

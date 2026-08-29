@@ -20,40 +20,26 @@ class LeaderboardServiceTest {
     lateinit var adminPassword: String
 
     @Test
-    fun `accepts team sizes from 1 to 4`() {
-        for (size in 1..4) {
-            val board = leaderboardService.create("Board size $size", ScoringMode.ELO, size)
-            assertThat(board.teamSize).isEqualTo(size)
-        }
-    }
-
-    @Test
-    fun `rejects a team size of 0`() {
-        assertThatThrownBy { leaderboardService.create("Too small", ScoringMode.ELO, 0) }
+    fun `rejects a blank admin password`() {
+        assertThatThrownBy { leaderboardService.create("No password", ScoringMode.WIN_COUNT, "") }
             .isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
-    fun `rejects a team size above 4`() {
-        assertThatThrownBy { leaderboardService.create("Too big", ScoringMode.ELO, 5) }
-            .isInstanceOf(IllegalArgumentException::class.java)
-    }
+    fun `the password set at creation is the one required to delete, not any other password`() {
+        val board = leaderboardService.create("Custom Password Board", ScoringMode.WIN_COUNT, "my-secret")
 
-    @Test
-    fun `rejects an elo leaderboard with no team size`() {
-        assertThatThrownBy { leaderboardService.create("No size", ScoringMode.ELO, null) }
-            .isInstanceOf(IllegalArgumentException::class.java)
-    }
+        assertThatThrownBy { leaderboardService.delete(board.id, adminPassword) }
+            .isInstanceOf(IllegalStateException::class.java)
 
-    @Test
-    fun `a win-count leaderboard ignores any team size passed in`() {
-        val board = leaderboardService.create("Win count board", ScoringMode.WIN_COUNT, 3)
-        assertThat(board.teamSize).isNull()
+        leaderboardService.delete(board.id, "my-secret")
+        assertThatThrownBy { leaderboardService.requireExists(board.id) }
+            .isInstanceOf(NoSuchElementException::class.java)
     }
 
     @Test
     fun `deleting with the correct admin password removes the leaderboard`() {
-        val board = leaderboardService.create("To delete", ScoringMode.WIN_COUNT, null)
+        val board = leaderboardService.create("To delete", ScoringMode.WIN_COUNT, adminPassword)
 
         leaderboardService.delete(board.id, adminPassword)
 
@@ -63,7 +49,7 @@ class LeaderboardServiceTest {
 
     @Test
     fun `deleting with the wrong admin password is rejected and keeps the leaderboard`() {
-        val board = leaderboardService.create("Keep me", ScoringMode.WIN_COUNT, null)
+        val board = leaderboardService.create("Keep me", ScoringMode.WIN_COUNT, adminPassword)
 
         assertThatThrownBy { leaderboardService.delete(board.id, "wrong-password") }
             .isInstanceOf(IllegalStateException::class.java)

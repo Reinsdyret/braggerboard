@@ -1,6 +1,7 @@
 package no.lars.leaderboard.web
 
 import no.lars.leaderboard.domain.Leaderboard
+import no.lars.leaderboard.domain.MAX_TEAM_SIZE
 import no.lars.leaderboard.domain.Match
 import no.lars.leaderboard.domain.MatchInput
 import no.lars.leaderboard.domain.MatchOutcome
@@ -64,11 +65,11 @@ class MatchController(
 
     private fun validated(leaderboard: Leaderboard, request: CreateMatchRequest): MatchInput {
         require(leaderboard.scoringMode == ScoringMode.ELO) { "This leaderboard uses win-count scoring, not matches" }
-        val teamSize = leaderboard.teamSize!!
 
-        require(request.teamA.size == teamSize && request.teamB.size == teamSize) {
-            "Each team needs exactly $teamSize participant(s) for this leaderboard's format"
-        }
+        require(request.teamA.isNotEmpty()) { "Each team needs at least one participant" }
+        require(request.teamA.size == request.teamB.size) { "Both teams must have the same number of participants" }
+        require(request.teamA.size <= MAX_TEAM_SIZE) { "Each team can have at most $MAX_TEAM_SIZE participants" }
+
         val allIds = request.teamA + request.teamB
         require(allIds.toSet().size == allIds.size) { "A participant can't appear more than once in a match" }
 

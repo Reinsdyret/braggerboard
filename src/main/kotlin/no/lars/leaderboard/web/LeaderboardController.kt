@@ -19,7 +19,7 @@ import java.util.UUID
 data class CreateLeaderboardRequest(
     val name: String,
     val scoringMode: ScoringMode = ScoringMode.WIN_COUNT,
-    val teamSize: Int? = null,
+    val password: String = "",
 )
 
 data class DeleteLeaderboardRequest(val password: String)
@@ -30,7 +30,7 @@ class LeaderboardController(private val leaderboardService: LeaderboardService) 
     @PostMapping("/api/leaderboards")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody request: CreateLeaderboardRequest): Leaderboard =
-        leaderboardService.create(request.name, request.scoringMode, request.teamSize)
+        leaderboardService.create(request.name, request.scoringMode, request.password)
 
     @GetMapping("/api/leaderboards/{leaderboardId}")
     fun get(@PathVariable leaderboardId: UUID): ResponseEntity<LeaderboardDetails> =

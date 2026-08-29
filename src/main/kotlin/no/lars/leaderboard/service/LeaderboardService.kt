@@ -2,14 +2,12 @@ package no.lars.leaderboard.service
 
 import no.lars.leaderboard.domain.Leaderboard
 import no.lars.leaderboard.domain.LeaderboardDetails
-import no.lars.leaderboard.domain.MAX_TEAM_SIZE
 import no.lars.leaderboard.domain.ParticipantStanding
 import no.lars.leaderboard.domain.ScoringMode
 import no.lars.leaderboard.repository.LeaderboardRepository
 import no.lars.leaderboard.repository.MatchRepository
 import no.lars.leaderboard.repository.ParticipantRepository
 import no.lars.leaderboard.repository.RoundRepository
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.NoSuchElementException
@@ -22,25 +20,14 @@ class LeaderboardService(
     private val roundRepository: RoundRepository,
     private val matchRepository: MatchRepository,
     private val passwordEncoder: PasswordEncoder,
-    @Value("\${admin.password}") private val defaultAdminPassword: String,
 ) {
 
-    fun create(name: String, scoringMode: ScoringMode, teamSize: Int?): Leaderboard {
+    fun create(name: String, scoringMode: ScoringMode, password: String): Leaderboard {
         require(name.isNotBlank()) { "Leaderboard name must not be blank" }
         require(name.length <= 100) { "Leaderboard name must be 100 characters or fewer" }
-        require(scoringMode != ScoringMode.ELO || teamSize != null) {
-            "An Elo leaderboard needs a team size"
-        }
-        require(teamSize == null || teamSize in 1..MAX_TEAM_SIZE) {
-            "Team size must be between 1 and $MAX_TEAM_SIZE"
-        }
-        val adminPasswordHash = passwordEncoder.encode(defaultAdminPassword)
-        return leaderboardRepository.create(
-            name.trim(),
-            scoringMode,
-            if (scoringMode == ScoringMode.ELO) teamSize else null,
-            adminPasswordHash,
-        )
+        require(password.isNotBlank()) { "Admin password must not be blank" }
+        val adminPasswordHash = passwordEncoder.encode(password)
+        return leaderboardRepository.create(name.trim(), scoringMode, adminPasswordHash)
     }
 
     fun delete(leaderboardId: UUID, password: String) {
@@ -93,7 +80,6 @@ class LeaderboardService(
             id = leaderboard.id,
             name = leaderboard.name,
             scoringMode = leaderboard.scoringMode,
-            teamSize = leaderboard.teamSize,
             createdAt = leaderboard.createdAt,
             participants = standings,
         )

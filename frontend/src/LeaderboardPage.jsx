@@ -126,7 +126,7 @@ export default function LeaderboardPage() {
         </h1>
         {isElo && (
           <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-400/10 dark:text-brand-300">
-            Elo · {leaderboard.teamSize}v{leaderboard.teamSize}
+            Elo rating
           </span>
         )}
         <Button
@@ -169,7 +169,6 @@ export default function LeaderboardPage() {
           <AddMatchForm
             leaderboardId={leaderboardId}
             participants={leaderboard.participants}
-            teamSize={leaderboard.teamSize}
             onAdded={refresh}
           />
         ) : (

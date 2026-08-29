@@ -14,7 +14,6 @@ data class Leaderboard(
     val id: UUID,
     val name: String,
     val scoringMode: ScoringMode,
-    val teamSize: Int?,
     val createdAt: Instant,
 )
 
@@ -22,7 +21,6 @@ data class LeaderboardDetails(
     val id: UUID,
     val name: String,
     val scoringMode: ScoringMode,
-    val teamSize: Int?,
     val createdAt: Instant,
     val participants: List<ParticipantStanding>,
 )

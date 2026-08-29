@@ -24,8 +24,8 @@ class RoundControllerValidationTest {
 
     @Test
     fun `rejects a round result for a participant from a different leaderboard`() {
-        val boardA = leaderboardRepository.create("Board A", ScoringMode.WIN_COUNT, null, "test-hash")
-        val boardB = leaderboardRepository.create("Board B", ScoringMode.WIN_COUNT, null, "test-hash")
+        val boardA = leaderboardRepository.create("Board A", ScoringMode.WIN_COUNT, "test-hash")
+        val boardB = leaderboardRepository.create("Board B", ScoringMode.WIN_COUNT, "test-hash")
         val outsider = participantRepository.create(boardB.id, "Outsider", null)
 
         assertThatThrownBy {
@@ -36,7 +36,7 @@ class RoundControllerValidationTest {
 
     @Test
     fun `accepts a round result for a participant that does belong to the leaderboard`() {
-        val board = leaderboardRepository.create("Board C", ScoringMode.WIN_COUNT, null, "test-hash")
+        val board = leaderboardRepository.create("Board C", ScoringMode.WIN_COUNT, "test-hash")
         val alice = participantRepository.create(board.id, "Alice", null)
 
         val round = roundController.create(board.id, CreateRoundRequest("Week 1", listOf(RoundResultInput(alice.id, 2))))

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trophy01, ChevronRight, AlertCircle, TrendUp01, User01, Users01 } from "@untitledui/icons";
-import { MAX_TEAM_SIZE } from "./constants.js";
+import { Trophy01, ChevronRight, AlertCircle, TrendUp01 } from "@untitledui/icons";
 import { createLeaderboard } from "./api.js";
 import { loadRecents } from "./recents.js";
 import Button from "./components/ui/Button.jsx";
@@ -23,11 +22,6 @@ const SCORING_MODES = [
     icon: TrendUp01,
   },
 ];
-
-const TEAM_SIZES = Array.from({ length: MAX_TEAM_SIZE }, (_, i) => {
-  const size = i + 1;
-  return { value: size, label: `${size} v ${size}`, icon: size === 1 ? User01 : Users01 };
-});
 
 function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
   return (
@@ -67,7 +61,7 @@ function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
 export default function Home() {
   const [name, setName] = useState("");
   const [scoringMode, setScoringMode] = useState("WIN_COUNT");
-  const [teamSize, setTeamSize] = useState(1);
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [recents, setRecents] = useState([]);
@@ -79,16 +73,12 @@ export default function Home() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || !password) return;
 
     setSubmitting(true);
     setError(null);
     try {
-      const leaderboard = await createLeaderboard(
-        name.trim(),
-        scoringMode,
-        scoringMode === "ELO" ? teamSize : null,
-      );
+      const leaderboard = await createLeaderboard(name.trim(), scoringMode, password);
       navigate(`/l/${leaderboard.id}`);
     } catch (err) {
       setError(err.message);
@@ -149,26 +139,21 @@ export default function Home() {
               </div>
             </div>
 
-            {scoringMode === "ELO" && (
-              <div>
-                <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                  Team size
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {TEAM_SIZES.map((format) => (
-                    <OptionCard
-                      key={format.value}
-                      selected={teamSize === format.value}
-                      onSelect={() => setTeamSize(format.value)}
-                      icon={format.icon}
-                      label={format.label}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            <div>
+              <label htmlFor="admin-password" className="mb-2 block text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+                Admin password
+              </label>
+              <Input
+                id="admin-password"
+                type="password"
+                placeholder="Choose a password to delete this leaderboard later"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-            <Button type="submit" size="lg" isLoading={submitting} isDisabled={!name.trim()}>
+            <Button type="submit" size="lg" isLoading={submitting} isDisabled={!name.trim() || !password}>
               Create leaderboard
             </Button>
             {error && (

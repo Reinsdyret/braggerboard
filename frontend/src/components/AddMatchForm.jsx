@@ -5,14 +5,25 @@ import { useToast } from "./ui/ToastProvider.jsx";
 import Button from "./ui/Button.jsx";
 import Card from "./ui/Card.jsx";
 import MatchTeamPicker from "./MatchTeamPicker.jsx";
+import { MAX_TEAM_SIZE } from "../constants.js";
+import { cx } from "../utils/cx.js";
 
-export default function AddMatchForm({ leaderboardId, participants, teamSize, onAdded }) {
-  const [teamA, setTeamA] = useState(() => Array(teamSize).fill(""));
-  const [teamB, setTeamB] = useState(() => Array(teamSize).fill(""));
+const TEAM_SIZES = Array.from({ length: MAX_TEAM_SIZE }, (_, i) => i + 1);
+
+export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
+  const [teamSize, setTeamSize] = useState(1);
+  const [teamA, setTeamA] = useState(() => Array(1).fill(""));
+  const [teamB, setTeamB] = useState(() => Array(1).fill(""));
   const [outcome, setOutcome] = useState("TEAM_A");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const addToast = useToast();
+
+  function handleTeamSizeChange(size) {
+    setTeamSize(size);
+    setTeamA(Array(size).fill(""));
+    setTeamB(Array(size).fill(""));
+  }
 
   const chosenIds = [...teamA, ...teamB].filter(Boolean);
   const allSlotsFilled = chosenIds.length === teamSize * 2;
@@ -44,16 +55,14 @@ export default function AddMatchForm({ leaderboardId, participants, teamSize, on
     }
   }
 
-  if (participants.length < teamSize * 2) {
+  if (participants.length < 2) {
     return (
       <Card>
         <div className="mb-1 flex items-center gap-2">
           <Zap size={18} className="text-brand-600" />
           <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Add match</h3>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Add at least {teamSize * 2} participants to record a match.
-        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Add at least 2 participants to record a match.</p>
       </Card>
     );
   }
@@ -66,17 +75,51 @@ export default function AddMatchForm({ leaderboardId, participants, teamSize, on
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <MatchTeamPicker
-          participants={participants}
-          teamA={teamA}
-          teamB={teamB}
-          outcome={outcome}
-          onTeamAChange={setTeamA}
-          onTeamBChange={setTeamB}
-          onOutcomeChange={setOutcome}
-        />
+        <div>
+          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+            Team size
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {TEAM_SIZES.map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => handleTeamSizeChange(size)}
+                className={cx(
+                  "rounded-lg border py-2 text-sm font-semibold transition-colors",
+                  teamSize === size
+                    ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-400/10 dark:text-brand-300"
+                    : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-600",
+                )}
+              >
+                {size}v{size}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        <Button type="submit" isLoading={submitting} isDisabled={!canSubmit} className="self-start">
+        {participants.length < teamSize * 2 ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Add at least {teamSize * 2} participants to record a {teamSize}v{teamSize} match.
+          </p>
+        ) : (
+          <MatchTeamPicker
+            participants={participants}
+            teamA={teamA}
+            teamB={teamB}
+            outcome={outcome}
+            onTeamAChange={setTeamA}
+            onTeamBChange={setTeamB}
+            onOutcomeChange={setOutcome}
+          />
+        )}
+
+        <Button
+          type="submit"
+          isLoading={submitting}
+          isDisabled={!canSubmit || participants.length < teamSize * 2}
+          className="self-start"
+        >
           Save match
         </Button>
 

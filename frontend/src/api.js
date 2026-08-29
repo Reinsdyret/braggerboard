@@ -15,11 +15,11 @@ async function handle(response) {
   return response.json();
 }
 
-export function createLeaderboard(name, scoringMode = "WIN_COUNT", teamSize = null) {
+export function createLeaderboard(name, scoringMode, password) {
   return fetch(`${API_BASE}/leaderboards`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, scoringMode, teamSize }),
+    body: JSON.stringify({ name, scoringMode, password }),
   }).then(handle);
 }
 

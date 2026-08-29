@@ -35,12 +35,11 @@ class AdminPasswordBackfillTest {
     fun `gives leaderboards from before this feature the default admin password`() {
         val legacyId = UUID.randomUUID()
         jdbcTemplate.update(
-            "INSERT INTO leaderboard (id, name, scoring_mode, team_size, created_at, admin_password_hash) " +
-                "VALUES (?, ?, ?, ?, ?, NULL)",
+            "INSERT INTO leaderboard (id, name, scoring_mode, created_at, admin_password_hash) " +
+                "VALUES (?, ?, ?, ?, NULL)",
             legacyId,
             "Pre-existing board",
             "WIN_COUNT",
-            null,
             Timestamp.from(Instant.now()),
         )
         assertThat(leaderboardRepository.findAdminPasswordHash(legacyId)).isNull()
