@@ -22,7 +22,7 @@ class LeaderboardRepository(private val jdbcTemplate: JdbcTemplate) {
         )
     }
 
-    fun create(name: String, scoringMode: ScoringMode, teamSize: Int?): Leaderboard {
+    fun create(name: String, scoringMode: ScoringMode, teamSize: Int?, adminPasswordHash: String): Leaderboard {
         val leaderboard = Leaderboard(
             id = UUID.randomUUID(),
             name = name,
@@ -31,12 +31,13 @@ class LeaderboardRepository(private val jdbcTemplate: JdbcTemplate) {
             createdAt = Instant.now(),
         )
         jdbcTemplate.update(
-            "INSERT INTO leaderboard (id, name, scoring_mode, team_size, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO leaderboard (id, name, scoring_mode, team_size, created_at, admin_password_hash) VALUES (?, ?, ?, ?, ?, ?)",
             leaderboard.id,
             leaderboard.name,
             leaderboard.scoringMode.name,
             leaderboard.teamSize,
             Timestamp.from(leaderboard.createdAt),
+            adminPasswordHash,
         )
         return leaderboard
     }
@@ -47,4 +48,18 @@ class LeaderboardRepository(private val jdbcTemplate: JdbcTemplate) {
             rowMapper,
             id,
         ).firstOrNull()
+
+    fun findAdminPasswordHash(id: UUID): String? =
+        jdbcTemplate.query(
+            "SELECT admin_password_hash FROM leaderboard WHERE id = ?",
+            { rs, _ -> rs.getString("admin_password_hash") },
+            id,
+        ).firstOrNull()
+
+    fun deleteById(id: UUID): Boolean =
+        jdbcTemplate.update("DELETE FROM leaderboard WHERE id = ?", id) > 0
+
+    fun backfillMissingAdminPasswordHashes(hash: String) {
+        jdbcTemplate.update("UPDATE leaderboard SET admin_password_hash = ? WHERE admin_password_hash IS NULL", hash)
+    }
 }

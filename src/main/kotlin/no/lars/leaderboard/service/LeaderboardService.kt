@@ -9,6 +9,8 @@ import no.lars.leaderboard.repository.LeaderboardRepository
 import no.lars.leaderboard.repository.MatchRepository
 import no.lars.leaderboard.repository.ParticipantRepository
 import no.lars.leaderboard.repository.RoundRepository
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.NoSuchElementException
 import java.util.UUID
@@ -19,6 +21,8 @@ class LeaderboardService(
     private val participantRepository: ParticipantRepository,
     private val roundRepository: RoundRepository,
     private val matchRepository: MatchRepository,
+    private val passwordEncoder: PasswordEncoder,
+    @Value("\${admin.password}") private val defaultAdminPassword: String,
 ) {
 
     fun create(name: String, scoringMode: ScoringMode, teamSize: Int?): Leaderboard {
@@ -30,7 +34,20 @@ class LeaderboardService(
         require(teamSize == null || teamSize in 1..MAX_TEAM_SIZE) {
             "Team size must be between 1 and $MAX_TEAM_SIZE"
         }
-        return leaderboardRepository.create(name.trim(), scoringMode, if (scoringMode == ScoringMode.ELO) teamSize else null)
+        val adminPasswordHash = passwordEncoder.encode(defaultAdminPassword)
+        return leaderboardRepository.create(
+            name.trim(),
+            scoringMode,
+            if (scoringMode == ScoringMode.ELO) teamSize else null,
+            adminPasswordHash,
+        )
+    }
+
+    fun delete(leaderboardId: UUID, password: String) {
+        val adminPasswordHash = leaderboardRepository.findAdminPasswordHash(leaderboardId)
+            ?: throw NoSuchElementException("Leaderboard $leaderboardId not found")
+        check(passwordEncoder.matches(password, adminPasswordHash)) { "Incorrect admin password" }
+        leaderboardRepository.deleteById(leaderboardId)
     }
 
     fun getDetails(leaderboardId: UUID): LeaderboardDetails {

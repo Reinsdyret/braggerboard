@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { ArrowNarrowLeft, Copy01, AlertCircle } from "@untitledui/icons";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowNarrowLeft, Copy01, AlertCircle, Trash02 } from "@untitledui/icons";
 import { deleteParticipant, getLeaderboard, getRounds, getMatches, deleteMatch } from "./api.js";
-import { saveRecent } from "./recents.js";
+import { saveRecent, removeRecent } from "./recents.js";
 import { useToast } from "./components/ui/ToastProvider.jsx";
 import Button from "./components/ui/Button.jsx";
 import Card from "./components/ui/Card.jsx";
@@ -16,9 +16,11 @@ import MatchHistory from "./components/MatchHistory.jsx";
 import PlayerCard from "./components/PlayerCard.jsx";
 import EditMatchDialog from "./components/EditMatchDialog.jsx";
 import EditParticipantDialog from "./components/EditParticipantDialog.jsx";
+import DeleteLeaderboardDialog from "./components/DeleteLeaderboardDialog.jsx";
 
 export default function LeaderboardPage() {
   const { leaderboardId } = useParams();
+  const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState(null);
   const [rounds, setRounds] = useState([]);
   const [matches, setMatches] = useState([]);
@@ -26,6 +28,7 @@ export default function LeaderboardPage() {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [editingMatch, setEditingMatch] = useState(null);
   const [editingParticipant, setEditingParticipant] = useState(null);
+  const [deletingLeaderboard, setDeletingLeaderboard] = useState(false);
   const addToast = useToast();
 
   const refresh = useCallback(async () => {
@@ -75,6 +78,12 @@ export default function LeaderboardPage() {
     });
   }
 
+  function handleLeaderboardDeleted() {
+    removeRecent(leaderboardId);
+    addToast("Leaderboard deleted", { type: "error", duration: 2500 });
+    navigate("/");
+  }
+
   if (loadError && !leaderboard) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center sm:px-6">
@@ -120,6 +129,15 @@ export default function LeaderboardPage() {
             Elo · {leaderboard.teamSize}v{leaderboard.teamSize}
           </span>
         )}
+        <Button
+          variant="danger"
+          size="sm"
+          iconLeading={Trash02}
+          onPress={() => setDeletingLeaderboard(true)}
+          className="ml-auto"
+        >
+          Delete leaderboard
+        </Button>
       </div>
 
       <Card className="mb-6 flex items-center justify-between gap-3 !p-3.5 sm:!p-4">
@@ -196,6 +214,14 @@ export default function LeaderboardPage() {
         isOpen={Boolean(editingParticipant)}
         onOpenChange={(open) => !open && setEditingParticipant(null)}
         onUpdated={refresh}
+      />
+
+      <DeleteLeaderboardDialog
+        leaderboardId={leaderboardId}
+        leaderboardName={leaderboard.name}
+        isOpen={deletingLeaderboard}
+        onOpenChange={setDeletingLeaderboard}
+        onDeleted={handleLeaderboardDeleted}
       />
     </div>
   );

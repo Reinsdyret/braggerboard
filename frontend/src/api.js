@@ -27,6 +27,14 @@ export function getLeaderboard(id) {
   return fetch(`${API_BASE}/leaderboards/${id}`, { cache: "no-store" }).then(handle);
 }
 
+export function deleteLeaderboard(id, password) {
+  return fetch(`${API_BASE}/leaderboards/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  }).then(handle);
+}
+
 export function addParticipant(leaderboardId, name, imageFile) {
   const formData = new FormData();
   formData.append("name", name);

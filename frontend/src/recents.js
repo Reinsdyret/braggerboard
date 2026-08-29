@@ -13,3 +13,8 @@ export function saveRecent(leaderboard) {
   recents.unshift({ id: leaderboard.id, name: leaderboard.name });
   localStorage.setItem(RECENTS_KEY, JSON.stringify(recents.slice(0, 10)));
 }
+
+export function removeRecent(leaderboardId) {
+  const recents = loadRecents().filter((r) => r.id !== leaderboardId);
+  localStorage.setItem(RECENTS_KEY, JSON.stringify(recents));
+}

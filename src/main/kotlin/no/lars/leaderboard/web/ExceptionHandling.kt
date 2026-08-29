@@ -23,6 +23,10 @@ class ExceptionHandling(
     fun handleBadRequest(ex: IllegalArgumentException): ResponseEntity<ErrorResponse> =
         ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(ex.message ?: "Bad request"))
 
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleForbidden(ex: IllegalStateException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponse(ex.message ?: "Forbidden"))
+
     @ExceptionHandler(MaxUploadSizeExceededException::class)
     fun handleTooLarge(ex: MaxUploadSizeExceededException): ResponseEntity<ErrorResponse> =
         ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)

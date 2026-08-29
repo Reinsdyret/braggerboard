@@ -7,6 +7,7 @@ import no.lars.leaderboard.service.LeaderboardService
 import org.springframework.http.CacheControl
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,6 +22,8 @@ data class CreateLeaderboardRequest(
     val teamSize: Int? = null,
 )
 
+data class DeleteLeaderboardRequest(val password: String)
+
 @RestController
 class LeaderboardController(private val leaderboardService: LeaderboardService) {
 
@@ -34,4 +37,10 @@ class LeaderboardController(private val leaderboardService: LeaderboardService) 
         ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
             .body(leaderboardService.getDetails(leaderboardId))
+
+    @DeleteMapping("/api/leaderboards/{leaderboardId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun delete(@PathVariable leaderboardId: UUID, @RequestBody request: DeleteLeaderboardRequest) {
+        leaderboardService.delete(leaderboardId, request.password)
+    }
 }

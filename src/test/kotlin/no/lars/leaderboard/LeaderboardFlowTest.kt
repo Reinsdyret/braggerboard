@@ -28,7 +28,7 @@ class LeaderboardFlowTest {
 
     @Test
     fun `creating rounds accumulates standings correctly`() {
-        val leaderboard = leaderboardRepository.create("Friday Darts", ScoringMode.WIN_COUNT, null)
+        val leaderboard = leaderboardRepository.create("Friday Darts", ScoringMode.WIN_COUNT, null, "test-hash")
         val alice = participantRepository.create(leaderboard.id, "Alice", null)
         val bob = participantRepository.create(leaderboard.id, "Bob", null)
 

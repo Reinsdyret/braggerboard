@@ -27,7 +27,7 @@ class ParticipantControllerUpdateTest {
 
     @Test
     fun `renaming a participant logs the old and new name`() {
-        val board = leaderboardRepository.create("Board", ScoringMode.WIN_COUNT, null)
+        val board = leaderboardRepository.create("Board", ScoringMode.WIN_COUNT, null, "test-hash")
         val alice = participantRepository.create(board.id, "Alice", null)
 
         val updated = participantController.update(alice.id, name = "Alicia", image = null, removeImage = false)
@@ -42,7 +42,7 @@ class ParticipantControllerUpdateTest {
 
     @Test
     fun `renaming to the exact same name does not create a log entry`() {
-        val board = leaderboardRepository.create("Board 2", ScoringMode.WIN_COUNT, null)
+        val board = leaderboardRepository.create("Board 2", ScoringMode.WIN_COUNT, null, "test-hash")
         val bob = participantRepository.create(board.id, "Bob", null)
 
         participantController.update(bob.id, name = "Bob", image = null, removeImage = false)
@@ -52,7 +52,7 @@ class ParticipantControllerUpdateTest {
 
     @Test
     fun `adding then removing a photo logs both changes`() {
-        val board = leaderboardRepository.create("Board 3", ScoringMode.WIN_COUNT, null)
+        val board = leaderboardRepository.create("Board 3", ScoringMode.WIN_COUNT, null, "test-hash")
         val carl = participantRepository.create(board.id, "Carl", null)
         val file = MockMultipartFile("image", "avatar.png", "image/png", realPng)
 
@@ -73,7 +73,7 @@ class ParticipantControllerUpdateTest {
 
     @Test
     fun `rejects a spoofed non-image file on update, same as on create`() {
-        val board = leaderboardRepository.create("Board 4", ScoringMode.WIN_COUNT, null)
+        val board = leaderboardRepository.create("Board 4", ScoringMode.WIN_COUNT, null, "test-hash")
         val dave = participantRepository.create(board.id, "Dave", null)
         val fake = MockMultipartFile("image", "fake.png", "image/png", "not a real image".toByteArray())
 
@@ -86,7 +86,7 @@ class ParticipantControllerUpdateTest {
 
     @Test
     fun `rejects blank or too-long names on update`() {
-        val board = leaderboardRepository.create("Board 5", ScoringMode.WIN_COUNT, null)
+        val board = leaderboardRepository.create("Board 5", ScoringMode.WIN_COUNT, null, "test-hash")
         val eve = participantRepository.create(board.id, "Eve", null)
 
         assertThatThrownBy {
