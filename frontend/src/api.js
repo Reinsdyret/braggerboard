@@ -42,6 +42,22 @@ export function deleteParticipant(participantId) {
   return fetch(`${API_BASE}/participants/${participantId}`, { method: "DELETE" }).then(handle);
 }
 
+export function updateParticipant(participantId, { name, imageFile, removeImage } = {}) {
+  const formData = new FormData();
+  if (name !== undefined && name !== null) formData.append("name", name);
+  if (imageFile) formData.append("image", imageFile);
+  if (removeImage) formData.append("removeImage", "true");
+
+  return fetch(`${API_BASE}/participants/${participantId}`, {
+    method: "PUT",
+    body: formData,
+  }).then(handle);
+}
+
+export function getParticipantChanges(participantId) {
+  return fetch(`${API_BASE}/participants/${participantId}/changes`, { cache: "no-store" }).then(handle);
+}
+
 export function addRound(leaderboardId, label, results) {
   return fetch(`${API_BASE}/leaderboards/${leaderboardId}/rounds`, {
     method: "POST",

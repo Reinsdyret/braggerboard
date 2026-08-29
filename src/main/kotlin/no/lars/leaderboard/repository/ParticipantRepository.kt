@@ -1,6 +1,8 @@
 package no.lars.leaderboard.repository
 
+import no.lars.leaderboard.domain.ChangeField
 import no.lars.leaderboard.domain.Participant
+import no.lars.leaderboard.domain.ParticipantChange
 import no.lars.leaderboard.domain.ParticipantImage
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
@@ -68,4 +70,47 @@ class ParticipantRepository(private val jdbcTemplate: JdbcTemplate) {
 
     fun delete(id: UUID): Boolean =
         jdbcTemplate.update("DELETE FROM participant WHERE id = ?", id) > 0
+
+    fun updateName(id: UUID, name: String) {
+        jdbcTemplate.update("UPDATE participant SET name = ? WHERE id = ?", name, id)
+    }
+
+    fun updateImage(id: UUID, image: ParticipantImage?) {
+        jdbcTemplate.update(
+            "UPDATE participant SET image_data = ?, image_content_type = ? WHERE id = ?",
+            image?.data,
+            image?.contentType,
+            id,
+        )
+    }
+
+    fun logChange(participantId: UUID, field: ChangeField, oldValue: String?, newValue: String?) {
+        jdbcTemplate.update(
+            "INSERT INTO participant_change (id, participant_id, field, old_value, new_value, changed_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?)",
+            UUID.randomUUID(),
+            participantId,
+            field.name,
+            oldValue,
+            newValue,
+            Timestamp.from(Instant.now()),
+        )
+    }
+
+    fun findChanges(participantId: UUID): List<ParticipantChange> =
+        jdbcTemplate.query(
+            "SELECT id, participant_id, field, old_value, new_value, changed_at " +
+                "FROM participant_change WHERE participant_id = ? ORDER BY changed_at DESC",
+            { rs, _ ->
+                ParticipantChange(
+                    id = UUID.fromString(rs.getString("id")),
+                    participantId = UUID.fromString(rs.getString("participant_id")),
+                    field = ChangeField.valueOf(rs.getString("field")),
+                    oldValue = rs.getString("old_value"),
+                    newValue = rs.getString("new_value"),
+                    changedAt = rs.getTimestamp("changed_at").toInstant(),
+                )
+            },
+            participantId,
+        )
 }

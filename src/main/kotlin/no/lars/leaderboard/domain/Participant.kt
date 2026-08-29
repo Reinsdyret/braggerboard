@@ -15,3 +15,17 @@ data class ParticipantImage(
     val data: ByteArray,
     val contentType: String,
 )
+
+enum class ChangeField {
+    NAME,
+    IMAGE,
+}
+
+data class ParticipantChange(
+    val id: UUID,
+    val participantId: UUID,
+    val field: ChangeField,
+    val oldValue: String?,
+    val newValue: String?,
+    val changedAt: Instant,
+)

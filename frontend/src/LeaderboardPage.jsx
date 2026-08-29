@@ -15,6 +15,7 @@ import AddMatchForm from "./components/AddMatchForm.jsx";
 import MatchHistory from "./components/MatchHistory.jsx";
 import PlayerCard from "./components/PlayerCard.jsx";
 import EditMatchDialog from "./components/EditMatchDialog.jsx";
+import EditParticipantDialog from "./components/EditParticipantDialog.jsx";
 
 export default function LeaderboardPage() {
   const { leaderboardId } = useParams();
@@ -24,6 +25,7 @@ export default function LeaderboardPage() {
   const [loadError, setLoadError] = useState(null);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [editingMatch, setEditingMatch] = useState(null);
+  const [editingParticipant, setEditingParticipant] = useState(null);
   const addToast = useToast();
 
   const refresh = useCallback(async () => {
@@ -176,6 +178,7 @@ export default function LeaderboardPage() {
         matches={matches}
         isOpen={Boolean(selectedParticipant)}
         onOpenChange={(open) => !open && setSelectedParticipant(null)}
+        onEdit={setEditingParticipant}
       />
 
       {isElo && (
@@ -187,6 +190,13 @@ export default function LeaderboardPage() {
           onUpdated={refresh}
         />
       )}
+
+      <EditParticipantDialog
+        participant={editingParticipant}
+        isOpen={Boolean(editingParticipant)}
+        onOpenChange={(open) => !open && setEditingParticipant(null)}
+        onUpdated={refresh}
+      />
     </div>
   );
 }

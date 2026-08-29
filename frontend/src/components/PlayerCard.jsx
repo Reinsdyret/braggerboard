@@ -1,8 +1,11 @@
+import { useEffect, useState } from "react";
 import { ModalOverlay, Modal, Dialog, Heading } from "react-aria-components";
-import { XClose, TrendUp01, TrendDown01, Users01 } from "@untitledui/icons";
+import { XClose, TrendUp01, TrendDown01, Users01, Pencil01 } from "@untitledui/icons";
+import { getParticipantChanges } from "../api.js";
 import Avatar from "./Avatar.jsx";
 import RatingHistoryChart from "./RatingHistoryChart.jsx";
 import StreakBadge from "./StreakBadge.jsx";
+import ChangeLog from "./ChangeLog.jsx";
 import { computeHeadToHead } from "../utils/headToHead.js";
 import { computeRatingHistory } from "../utils/ratingHistory.js";
 import { computeStreak } from "../utils/streak.js";
@@ -45,7 +48,19 @@ function OpponentGroup({ title, icon, iconClass, opponents }) {
   );
 }
 
-export default function PlayerCard({ participant, scoringMode, matches, isOpen, onOpenChange }) {
+export default function PlayerCard({ participant, scoringMode, matches, isOpen, onOpenChange, onEdit }) {
+  const [changes, setChanges] = useState([]);
+
+  useEffect(() => {
+    if (!participant) {
+      setChanges([]);
+      return;
+    }
+    getParticipantChanges(participant.id)
+      .then(setChanges)
+      .catch(() => setChanges([]));
+  }, [participant]);
+
   if (!participant) return null;
 
   const stats = scoringMode === "ELO" ? computeHeadToHead(participant.id, matches) : null;
@@ -80,6 +95,16 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                 className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
               >
                 <XClose size={18} />
+              </button>
+              <button
+                onClick={() => {
+                  close();
+                  onEdit(participant);
+                }}
+                aria-label="Edit profile"
+                className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+              >
+                <Pencil01 size={16} />
               </button>
 
               <div className="mb-5 flex flex-col items-center text-center">
@@ -141,6 +166,12 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                     />
                   )}
                 </>
+              )}
+
+              {changes.length > 0 && (
+                <div className={scoringMode === "ELO" ? "mt-5" : ""}>
+                  <ChangeLog changes={changes} />
+                </div>
               )}
             </>
           )}
