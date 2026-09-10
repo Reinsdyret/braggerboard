@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Minus, Flag01, AlertCircle } from "@untitledui/icons";
+import { Plus, Minus, Flag, AlertCircle } from "lucide-react";
 import { addRound } from "../api.js";
 import { useToast } from "./ui/ToastProvider.jsx";
 import Button from "./ui/Button.jsx";
@@ -8,23 +8,23 @@ import Input from "./ui/Input.jsx";
 
 function Stepper({ value, onChange }) {
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white p-1 dark:border-gray-600 dark:bg-gray-800">
+    <div className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white p-1">
       <button
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
         disabled={value <= 0}
-        className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-30 dark:text-gray-400 dark:hover:bg-gray-700"
+        className="flex h-7 w-7 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-30"
         aria-label="Decrease"
       >
         <Minus size={14} />
       </button>
-      <span className="w-6 text-center text-sm font-semibold tabular-nums text-gray-900 dark:text-gray-100">
+      <span className="w-6 text-center text-sm font-semibold tabular-nums text-gray-900">
         {value}
       </span>
       <button
         type="button"
         onClick={() => onChange(value + 1)}
-        className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+        className="flex h-7 w-7 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-gray-100"
         aria-label="Increase"
       >
         <Plus size={14} />
@@ -78,8 +78,8 @@ export default function AddRoundForm({ leaderboardId, participants, onAdded }) {
   return (
     <Card>
       <div className="mb-4 flex items-center gap-2">
-        <Flag01 size={18} className="text-brand-600" />
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Add round</h3>
+        <Flag size={18} className="text-gray-900" />
+        <h3 className="text-sm font-semibold text-gray-700">Add round</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -90,10 +90,10 @@ export default function AddRoundForm({ leaderboardId, participants, onAdded }) {
           onChange={(e) => setLabel(e.target.value)}
         />
 
-        <div className="flex flex-col divide-y divide-gray-100 rounded-xl border border-gray-200 dark:divide-gray-700 dark:border-gray-700">
+        <div className="flex flex-col divide-y divide-gray-200 border border-gray-200">
           {participants.map((p) => (
             <div key={p.id} className="flex items-center justify-between gap-3 px-3.5 py-2.5">
-              <span className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">{p.name}</span>
+              <span className="truncate text-sm font-medium text-gray-800">{p.name}</span>
               <Stepper value={wins[p.id] ?? 0} onChange={(v) => setWinsFor(p.id, v)} />
             </div>
           ))}
@@ -104,7 +104,7 @@ export default function AddRoundForm({ leaderboardId, participants, onAdded }) {
         </Button>
 
         {error && (
-          <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
+          <p className="flex items-center gap-1.5 text-sm text-[#9c0f0f]">
             <AlertCircle size={16} className="shrink-0" />
             {error}
           </p>

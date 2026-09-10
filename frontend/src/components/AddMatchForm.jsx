@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Zap, AlertCircle } from "@untitledui/icons";
+import { Zap, AlertCircle } from "lucide-react";
 import { addMatch } from "../api.js";
 import { useToast } from "./ui/ToastProvider.jsx";
 import Button from "./ui/Button.jsx";
@@ -59,10 +59,10 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
     return (
       <Card>
         <div className="mb-1 flex items-center gap-2">
-          <Zap size={18} className="text-brand-600" />
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Add match</h3>
+          <Zap size={18} className="text-gray-900" />
+          <h3 className="text-sm font-semibold text-gray-700">Add match</h3>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Add at least 2 participants to record a match.</p>
+        <p className="text-sm text-gray-600">Add at least 2 participants to record a match.</p>
       </Card>
     );
   }
@@ -70,13 +70,13 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
   return (
     <Card>
       <div className="mb-4 flex items-center gap-2">
-        <Zap size={18} className="text-brand-600" />
+        <Zap size={18} className="text-gray-900" />
         <h3 className="text-sm font-semibold text-gray-700">Add match</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-600 uppercase">
             Team size
           </p>
           <div className="grid grid-cols-4 gap-2">
@@ -88,8 +88,8 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
                 className={cx(
                   "rounded-lg border py-2 text-sm font-semibold transition-colors",
                   teamSize === size
-                    ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-400/10 dark:text-brand-300"
-                    : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-600",
+                    ? "border-gray-900 bg-gray-900 text-white"
+                    : "border-gray-200 text-gray-600 hover:border-gray-400",
                 )}
               >
                 {size}v{size}
@@ -99,7 +99,7 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
         </div>
 
         {participants.length < teamSize * 2 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-600">
             Add at least {teamSize * 2} participants to record a {teamSize}v{teamSize} match.
           </p>
         ) : (
@@ -124,7 +124,7 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
         </Button>
 
         {error && (
-          <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
+          <p className="flex items-center gap-1.5 text-sm text-[#9c0f0f]">
             <AlertCircle size={16} className="shrink-0" />
             {error}
           </p>

@@ -25,7 +25,7 @@ function initials(name) {
 export default function Avatar({ participant, size = "md", rankColor }) {
   const sizeClass = SIZES[size];
   const ringClass = rankColor
-    ? cx("ring-2 ring-offset-2 dark:ring-offset-gray-800", RING_COLORS[rankColor])
+    ? cx("ring-2 ring-offset-2", RING_COLORS[rankColor])
     : "";
 
   if (participant.hasImage) {
@@ -41,7 +41,7 @@ export default function Avatar({ participant, size = "md", rankColor }) {
   return (
     <div
       className={cx(
-        "flex shrink-0 items-center justify-center rounded-full bg-brand-100 font-semibold text-brand-700 dark:bg-brand-400/15 dark:text-brand-300",
+        "flex shrink-0 items-center justify-center rounded-full bg-brand-50 font-semibold text-brand-900",
         sizeClass,
         ringClass,
       )}

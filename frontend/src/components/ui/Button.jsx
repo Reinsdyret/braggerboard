@@ -1,18 +1,20 @@
 import { Button as AriaButton } from "react-aria-components";
-import { Loading03 } from "@untitledui/icons";
+import { Loader2 } from "lucide-react";
 import { cx } from "../../utils/cx.js";
 
+// Colors and states mirror Timer's real ._primaryButton_/._secondaryButton_ exactly: solid
+// black primary (not a brand color), white secondary with a black border, disabled fill #f4f4f4.
 const VARIANTS = {
   primary:
-    "bg-brand-600 text-white shadow-sm hover:bg-brand-700 data-[pressed]:bg-brand-800 data-[disabled]:bg-gray-200 data-[disabled]:text-gray-400 dark:data-[disabled]:bg-gray-700 dark:data-[disabled]:text-gray-500",
+    "border border-gray-900 bg-gray-900 text-white hover:bg-gray-600 hover:border-gray-600 data-[pressed]:bg-gray-800 data-[disabled]:border-transparent data-[disabled]:bg-gray-100 data-[disabled]:text-gray-900",
   secondary:
-    "bg-white text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50 data-[pressed]:bg-gray-100 data-[disabled]:text-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 dark:data-[pressed]:bg-gray-600 dark:data-[disabled]:text-gray-600",
+    "bg-white text-gray-900 border border-gray-900 hover:bg-gray-200 data-[pressed]:bg-gray-300 data-[disabled]:border-gray-200 data-[disabled]:text-gray-400",
   ghost:
-    "bg-transparent text-gray-600 hover:bg-gray-100 data-[pressed]:bg-gray-200 data-[disabled]:text-gray-300 dark:text-gray-400 dark:hover:bg-gray-700 dark:data-[pressed]:bg-gray-600 dark:data-[disabled]:text-gray-600",
+    "bg-transparent text-gray-600 hover:bg-gray-100 data-[pressed]:bg-gray-200 data-[disabled]:text-gray-300",
   danger:
-    "bg-transparent text-red-600 hover:bg-red-50 data-[pressed]:bg-red-100 data-[disabled]:text-gray-300 dark:text-red-400 dark:hover:bg-red-950/40 dark:data-[pressed]:bg-red-900/40 dark:data-[disabled]:text-gray-600",
+    "bg-transparent text-[#9c0f0f] hover:bg-[#ffebee] data-[pressed]:bg-[#ffdce0] data-[disabled]:text-gray-300",
   "danger-solid":
-    "bg-red-600 text-white shadow-sm hover:bg-red-700 data-[pressed]:bg-red-800 data-[disabled]:bg-gray-200 data-[disabled]:text-gray-400 dark:data-[disabled]:bg-gray-700 dark:data-[disabled]:text-gray-500",
+    "bg-[#9c0f0f] text-white border border-[#9c0f0f] hover:bg-[#7c0c0c] hover:border-[#7c0c0c] data-[pressed]:bg-[#5e0909] data-[disabled]:border-transparent data-[disabled]:bg-gray-100 data-[disabled]:text-gray-900",
 };
 
 const SIZES = {
@@ -36,8 +38,8 @@ export default function Button({
     <AriaButton
       isDisabled={isDisabled || isLoading}
       className={cx(
-        "inline-flex items-center justify-center rounded-lg font-semibold whitespace-nowrap transition-colors duration-100 outline-none",
-        "focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
+        "inline-flex items-center justify-center rounded-lg font-normal whitespace-nowrap transition-colors duration-100 outline-none",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500",
         "cursor-pointer data-[disabled]:cursor-not-allowed",
         VARIANTS[variant],
         SIZES[size],
@@ -46,7 +48,7 @@ export default function Button({
       {...props}
     >
       {isLoading ? (
-        <Loading03 size={16} className="animate-spin-slow" />
+        <Loader2 size={16} className="animate-spin-slow" />
       ) : (
         IconLeading && <IconLeading size={16} />
       )}

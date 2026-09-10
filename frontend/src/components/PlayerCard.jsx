@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ModalOverlay, Modal, Dialog, Heading } from "react-aria-components";
-import { XClose, TrendUp01, TrendDown01, Users01, Pencil01 } from "@untitledui/icons";
+import { X, TrendingUp, TrendingDown, Users, Pencil } from "lucide-react";
 import { getParticipantChanges } from "../api.js";
 import Avatar from "./Avatar.jsx";
 import RatingHistoryChart from "./RatingHistoryChart.jsx";
@@ -13,23 +13,23 @@ import { cx } from "../utils/cx.js";
 
 function StatBox({ label, value }) {
   return (
-    <div className="rounded-xl bg-gray-50 py-3 text-center dark:bg-gray-700/50">
-      <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{value}</p>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+    <div className="bg-gray-50 py-3 text-center">
+      <p className="text-lg font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-600">{label}</p>
     </div>
   );
 }
 
 function OpponentRow({ icon: Icon, iconClass, opponent }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+    <div className="flex items-center gap-3 border border-gray-200 p-3">
       <div className={cx("flex h-9 w-9 shrink-0 items-center justify-center rounded-full", iconClass)}>
         <Icon size={16} />
       </div>
-      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-gray-900">
         {opponent.name}
       </p>
-      <p className="shrink-0 text-sm font-medium text-gray-500 dark:text-gray-400">
+      <p className="shrink-0 text-sm font-medium text-gray-600">
         {opponent.wins}-{opponent.losses}
         {opponent.draws ? `-${opponent.draws}` : ""}
       </p>
@@ -40,7 +40,7 @@ function OpponentRow({ icon: Icon, iconClass, opponent }) {
 function OpponentGroup({ title, icon, iconClass, opponents }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">{title}</p>
+      <p className="text-xs font-semibold tracking-wide text-gray-600 uppercase">{title}</p>
       {opponents.map((opponent) => (
         <OpponentRow key={opponent.id} icon={icon} iconClass={iconClass} opponent={opponent} />
       ))}
@@ -83,18 +83,18 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       isDismissable
-      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-gray-900/40 backdrop-blur-[2px] sm:items-center sm:p-4"
+      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-[#dedede]/50 backdrop-blur-[2px] sm:items-center sm:p-4"
     >
-      <Modal className="animate-modal-in relative max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl dark:bg-gray-800">
+      <Modal className="animate-modal-in relative max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl">
         <Dialog className="outline-none">
           {({ close }) => (
             <>
               <button
                 onClick={close}
                 aria-label="Close"
-                className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600"
               >
-                <XClose size={18} />
+                <X size={18} />
               </button>
               <button
                 onClick={() => {
@@ -102,18 +102,18 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                   onEdit(participant);
                 }}
                 aria-label="Edit profile"
-                className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600"
               >
-                <Pencil01 size={16} />
+                <Pencil size={16} />
               </button>
 
               <div className="mb-5 flex flex-col items-center text-center">
                 <Avatar participant={participant} size="lg" />
-                <Heading slot="title" className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
+                <Heading slot="title" className="mt-3 text-lg font-bold text-gray-900">
                   {participant.name}
                 </Heading>
                 <div className="mt-1 flex items-center gap-2">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-600">
                     {scoringMode === "ELO" ? `${participant.rating} rating` : `${participant.totalWins} wins`}
                   </p>
                   <StreakBadge streak={streak} />
@@ -130,28 +130,28 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                   </div>
 
                   <div className="mb-5">
-                    <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+                    <p className="mb-2 text-xs font-semibold tracking-wide text-gray-600 uppercase">
                       Rating history
                     </p>
                     <RatingHistoryChart history={ratingHistory} />
                   </div>
 
                   {opponents.length === 0 && (
-                    <p className="text-center text-sm text-gray-500 dark:text-gray-400">No matches recorded yet.</p>
+                    <p className="text-center text-sm text-gray-600">No matches recorded yet.</p>
                   )}
 
                   {opponents.length > 0 && hasClearSpread && (
                     <div className="flex flex-col gap-4">
                       <OpponentGroup
                         title="Best against"
-                        icon={TrendUp01}
-                        iconClass="bg-green-100 text-green-600 dark:bg-green-400/10 dark:text-green-400"
+                        icon={TrendingUp}
+                        iconClass="bg-green-100 text-green-600"
                         opponents={bestGroup}
                       />
                       <OpponentGroup
                         title="Toughest opponent"
-                        icon={TrendDown01}
-                        iconClass="bg-red-100 text-red-500 dark:bg-red-400/10 dark:text-red-400"
+                        icon={TrendingDown}
+                        iconClass="bg-[#ffebee] text-[#9c0f0f]"
                         opponents={worstGroup}
                       />
                     </div>
@@ -160,8 +160,8 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                   {opponents.length > 0 && !hasClearSpread && (
                     <OpponentGroup
                       title="Head to head"
-                      icon={Users01}
-                      iconClass="bg-brand-100 text-brand-600 dark:bg-brand-400/10 dark:text-brand-300"
+                      icon={Users}
+                      iconClass="bg-brand-50 text-brand-900"
                       opponents={opponents}
                     />
                   )}

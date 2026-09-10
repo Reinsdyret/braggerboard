@@ -156,6 +156,71 @@ function seedEloLeaderboard() {
   ensureRecent(leaderboard);
 }
 
+function seedElo2v2Leaderboard() {
+  const leaderboardId = "demo-elo-2v2";
+  const leaderboard = {
+    id: leaderboardId,
+    name: "Foosball Doubles",
+    scoringMode: "ELO",
+    createdAt: daysAgo(60),
+    adminPassword: "demo",
+  };
+  db.leaderboards.set(leaderboardId, leaderboard);
+
+  const roster = [
+    { name: "Nora", skill: 1200, joinedDaysAgo: 59 },
+    { name: "Omar", skill: 1100, joinedDaysAgo: 59 },
+    { name: "Priya", skill: 1050, joinedDaysAgo: 58 },
+    { name: "Quentin", skill: 950, joinedDaysAgo: 55 },
+    { name: "Rosa", skill: 1150, joinedDaysAgo: 50 },
+    { name: "Sam", skill: 1000, joinedDaysAgo: 40 },
+    { name: "Tara", skill: 900, joinedDaysAgo: 25 },
+    { name: "Uma", skill: 1080, joinedDaysAgo: 15 },
+  ];
+
+  const participants = roster.map((r) => {
+    const id = uuid();
+    db.participants.set(id, {
+      id,
+      leaderboardId,
+      name: r.name,
+      hasImage: false,
+      imageDataUrl: null,
+      createdAt: daysAgo(r.joinedDaysAgo),
+    });
+    return { id, ...r };
+  });
+
+  let t = 58;
+  for (let i = 0; i < 70 && t > 0.3; i++) {
+    t -= 0.3 + Math.random() * 1.5;
+    if (t < 0.2) t = 0.2;
+    const eligible = participants.filter((p) => p.joinedDaysAgo >= t);
+    // Mostly 2v2, occasionally 1v1 when there aren't enough people around (or just for variety).
+    const wantsDuo = Math.random() < 0.8;
+    const teamSize = wantsDuo && eligible.length >= 4 ? 2 : 1;
+    if (eligible.length < teamSize * 2) continue;
+
+    const shuffled = [...eligible].sort(() => Math.random() - 0.5);
+    const teamAPlayers = shuffled.slice(0, teamSize);
+    const teamBPlayers = shuffled.slice(teamSize, teamSize * 2);
+    const skillA = teamAPlayers.reduce((sum, p) => sum + p.skill, 0) / teamSize;
+    const skillB = teamBPlayers.reduce((sum, p) => sum + p.skill, 0) / teamSize;
+
+    const matchId = uuid();
+    db.matches.set(matchId, {
+      id: matchId,
+      leaderboardId,
+      teamA: teamAPlayers.map((p) => ({ participantId: p.id })),
+      teamB: teamBPlayers.map((p) => ({ participantId: p.id })),
+      outcome: pickOutcome(skillA, skillB),
+      createdAt: daysAgo(t),
+    });
+  }
+
+  ensureRecent(leaderboard);
+}
+
 function seedWinCountLeaderboard() {
   const leaderboardId = "demo-wins";
   const leaderboard = {
@@ -211,6 +276,7 @@ function seedWinCountLeaderboard() {
 }
 
 seedEloLeaderboard();
+seedElo2v2Leaderboard();
 seedWinCountLeaderboard();
 
 // --- public API, mirroring api.js's signatures ---------------------------------------------

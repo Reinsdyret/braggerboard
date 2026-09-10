@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { TrendUp01 } from "@untitledui/icons";
-import { useIsDarkMode } from "../utils/useIsDarkMode.js";
+import { TrendingUp } from "lucide-react";
 import { colorForIndex } from "../utils/chartPalette.js";
 import { cx } from "../utils/cx.js";
 import EmptyState from "./ui/EmptyState.jsx";
@@ -67,16 +66,13 @@ function layoutEndLabels(entries) {
   return sorted;
 }
 
+const CHROME = { grid: "#f5f5f5", axis: "#a3a3a3", ring: "#ffffff", crosshair: "#d4d4d4" };
+
 export default function ContestantsChart({ title, valueLabel, timelines, emptyMessage }) {
-  const isDark = useIsDarkMode();
   const containerRef = useRef(null);
   const width = useContainerWidth(containerRef, 640);
   const [hidden, setHidden] = useState(() => new Set());
   const [hoverX, setHoverX] = useState(null);
-
-  const chrome = isDark
-    ? { grid: "#374151", axis: "#6b7280", ring: "#1f2937", crosshair: "#4b5563" }
-    : { grid: "#f3f4f6", axis: "#9ca3af", ring: "#ffffff", crosshair: "#d1d5db" };
 
   // Color is keyed to join order, not the current standings rank - so a contestant keeps
   // their color as ranks shuffle around them instead of colors reshuffling with the table.
@@ -84,7 +80,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
   const colorById = new Map(
     [...active]
       .sort((a, b) => new Date(a.participant.createdAt) - new Date(b.participant.createdAt))
-      .map((t, i) => [t.participant.id, colorForIndex(i, isDark)]),
+      .map((t, i) => [t.participant.id, colorForIndex(i)]),
   );
   const series = active.map((t) => ({ ...t, color: colorById.get(t.participant.id) }));
 
@@ -98,7 +94,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
   }
 
   if (series.length === 0) {
-    return <EmptyState icon={TrendUp01} title="Nothing to chart yet" description={emptyMessage} />;
+    return <EmptyState icon={TrendingUp} title="Nothing to chart yet" description={emptyMessage} />;
   }
 
   const allPoints = series.flatMap((t) => t.points.map((p) => ({ ...p, time: new Date(p.date).getTime() })));
@@ -164,7 +160,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
   return (
     <div>
       {title && (
-        <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+        <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-600 uppercase">
           {title}
         </h2>
       )}
@@ -180,8 +176,8 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
               className={cx(
                 "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
                 isHidden
-                  ? "border-gray-200 text-gray-400 dark:border-gray-700 dark:text-gray-500"
-                  : "border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200",
+                  ? "border-gray-200 text-gray-400"
+                  : "border-gray-200 text-gray-700",
               )}
             >
               <span
@@ -203,10 +199,10 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
                 x2={margin.left + plotWidth}
                 y1={yScale(tick)}
                 y2={yScale(tick)}
-                stroke={chrome.grid}
+                stroke={CHROME.grid}
                 strokeWidth="1"
               />
-              <text x={margin.left - 8} y={yScale(tick)} dy="0.32em" textAnchor="end" fontSize="10" fill={chrome.axis}>
+              <text x={margin.left - 8} y={yScale(tick)} dy="0.32em" textAnchor="end" fontSize="10" fill={CHROME.axis}>
                 {Math.round(tick).toLocaleString()}
               </text>
             </g>
@@ -219,14 +215,14 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
               y={HEIGHT - 8}
               textAnchor={i === 0 ? "start" : i === xTicks.length - 1 ? "end" : "middle"}
               fontSize="10"
-              fill={chrome.axis}
+              fill={CHROME.axis}
             >
               {formatAxisDate(tick, spanMultiYear)}
             </text>
           ))}
 
           {hoverX != null && (
-            <line x1={hoverX} x2={hoverX} y1={margin.top} y2={margin.top + plotHeight} stroke={chrome.crosshair} strokeWidth="1" />
+            <line x1={hoverX} x2={hoverX} y1={margin.top} y2={margin.top + plotHeight} stroke={CHROME.crosshair} strokeWidth="1" />
           )}
 
           {visible.map((t) => {
@@ -245,7 +241,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
                   />
                 )}
                 {coords.map(([x, y], i) => (
-                  <circle key={i} cx={x} cy={y} r="4" fill={t.color} stroke={chrome.ring} strokeWidth="2" />
+                  <circle key={i} cx={x} cy={y} r="4" fill={t.color} stroke={CHROME.ring} strokeWidth="2" />
                 ))}
               </g>
             );
@@ -259,7 +255,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
               dy="0.32em"
               fontSize="11"
               fontWeight="600"
-              fill={isDark ? "#d1d5db" : "#374151"}
+              fill="#404040"
             >
               {label.name.length > 14 ? `${label.name.slice(0, 13)}…` : label.name}
             </text>
@@ -278,18 +274,18 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
 
         {hoverRows.length > 0 && (
           <div
-            className="pointer-events-none absolute top-2 z-10 w-48 -translate-x-1/2 rounded-xl border border-gray-200 bg-white p-2.5 shadow-[var(--shadow-popover)] dark:border-gray-700 dark:bg-gray-800"
+            className="pointer-events-none absolute top-2 z-10 w-48 -translate-x-1/2 border border-gray-200 bg-white p-2.5 shadow-[var(--shadow-popover)]"
             style={{ left: tooltipLeft }}
           >
-            <p className="mb-1.5 text-[11px] font-medium text-gray-400 dark:text-gray-500">
+            <p className="mb-1.5 text-[11px] font-medium text-gray-400">
               {formatTooltipDate(hoverTime)}
             </p>
             <ul className="flex flex-col gap-1">
               {hoverRows.map((row) => (
                 <li key={row.id} className="flex items-center gap-1.5 text-xs">
                   <span className="h-0.5 w-3 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
-                  <span className="min-w-0 flex-1 truncate text-gray-500 dark:text-gray-400">{row.name}</span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  <span className="min-w-0 flex-1 truncate text-gray-600">{row.name}</span>
+                  <span className="font-semibold text-gray-900">
                     {Math.round(row.value).toLocaleString()}
                   </span>
                 </li>

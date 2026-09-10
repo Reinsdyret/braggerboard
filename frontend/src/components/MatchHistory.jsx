@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Zap, Pencil01, Trash02 } from "@untitledui/icons";
+import { Zap, Pencil, Trash2 } from "lucide-react";
 import EmptyState from "./ui/EmptyState.jsx";
 import Badge from "./ui/Badge.jsx";
 import ConfirmDialog from "./ui/ConfirmDialog.jsx";
@@ -42,27 +42,27 @@ export default function MatchHistory({ matches, onEdit, onDelete }) {
         {matches.map((match) => (
           <li
             key={match.id}
-            className="rounded-2xl border border-gray-200 bg-white p-4 shadow-[var(--shadow-card)] sm:p-5 dark:border-gray-700 dark:bg-gray-800"
+            className="border border-gray-200 bg-white p-4 shadow-[var(--shadow-card)] sm:p-5"
           >
             <div className="mb-2.5 flex items-center justify-between gap-3">
               <Badge color={OUTCOME_COLOR[match.outcome]}>{OUTCOME_LABEL[match.outcome]}</Badge>
               <div className="flex shrink-0 items-center gap-1">
-                <span className="mr-1 text-xs text-gray-400 dark:text-gray-500">{formatDate(match.createdAt)}</span>
+                <span className="mr-1 text-xs text-gray-400">{formatDate(match.createdAt)}</span>
                 <button
                   type="button"
                   onClick={() => onEdit(match)}
                   aria-label="Edit match"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-gray-100 hover:text-gray-600"
                 >
-                  <Pencil01 size={14} />
+                  <Pencil size={14} />
                 </button>
                 <button
                   type="button"
                   onClick={() => setPendingDelete(match)}
                   aria-label="Delete match"
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500 dark:text-gray-600 dark:hover:bg-red-400/10 dark:hover:text-red-400"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-[#ffebee] hover:text-[#9c0f0f]"
                 >
-                  <Trash02 size={14} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>
@@ -70,18 +70,18 @@ export default function MatchHistory({ matches, onEdit, onDelete }) {
               <span
                 className={
                   match.outcome === "TEAM_A"
-                    ? "font-semibold text-gray-900 dark:text-gray-100"
-                    : "text-gray-600 dark:text-gray-400"
+                    ? "font-semibold text-gray-900"
+                    : "text-gray-600"
                 }
               >
                 {teamNames(match.teamA)}
               </span>
-              <span className="text-xs font-semibold text-gray-400 dark:text-gray-500">vs</span>
+              <span className="text-xs font-semibold text-gray-400">vs</span>
               <span
                 className={
                   match.outcome === "TEAM_B"
-                    ? "font-semibold text-gray-900 dark:text-gray-100"
-                    : "text-gray-600 dark:text-gray-400"
+                    ? "font-semibold text-gray-900"
+                    : "text-gray-600"
                 }
               >
                 {teamNames(match.teamB)}

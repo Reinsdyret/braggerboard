@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ModalOverlay, Modal, Dialog, Heading } from "react-aria-components";
-import { XClose, AlertCircle } from "@untitledui/icons";
+import { X, AlertCircle } from "lucide-react";
 import { updateMatch } from "../api.js";
 import { useToast } from "./ui/ToastProvider.jsx";
 import Button from "./ui/Button.jsx";
@@ -58,23 +58,23 @@ export default function EditMatchDialog({ match, participants, isOpen, onOpenCha
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       isDismissable={!submitting}
-      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-gray-900/40 backdrop-blur-[2px] sm:items-center sm:p-4"
+      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-[#dedede]/50 backdrop-blur-[2px] sm:items-center sm:p-4"
     >
-      <Modal className="animate-modal-in relative w-full max-w-sm rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl dark:bg-gray-800">
+      <Modal className="animate-modal-in relative w-full max-w-sm rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl">
         <Dialog className="outline-none">
           {({ close }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <Heading slot="title" className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <Heading slot="title" className="text-base font-semibold text-gray-900">
                   Edit match
                 </Heading>
                 <button
                   type="button"
                   onClick={close}
                   aria-label="Close"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                 >
-                  <XClose size={18} />
+                  <X size={18} />
                 </button>
               </div>
 
@@ -98,7 +98,7 @@ export default function EditMatchDialog({ match, participants, isOpen, onOpenCha
               </div>
 
               {error && (
-                <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
+                <p className="flex items-center gap-1.5 text-sm text-[#9c0f0f]">
                   <AlertCircle size={16} className="shrink-0" />
                   {error}
                 </p>

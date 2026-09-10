@@ -1,15 +1,15 @@
 // Validated categorical palette (dataviz skill, references/palette.md): fixed hue order,
-// colorblind-safe on adjacent pairs in both light and dark mode. Assign by index, never cycle
-// within the first 8 - a participant keeps the same color for as long as they're on the board.
+// colorblind-safe on adjacent pairs. Assign by index, never cycle within the first 8 - a
+// participant keeps the same color for as long as they're on the board.
 const CATEGORICAL = [
-  { light: "#2a78d6", dark: "#3987e5" }, // blue
-  { light: "#eb6834", dark: "#d95926" }, // orange
-  { light: "#1baf7a", dark: "#199e70" }, // aqua
-  { light: "#eda100", dark: "#c98500" }, // yellow
-  { light: "#e87ba4", dark: "#d55181" }, // magenta
-  { light: "#008300", dark: "#008300" }, // green
-  { light: "#4a3aa7", dark: "#9085e9" }, // violet
-  { light: "#e34948", dark: "#e66767" }, // red
+  "#2a78d6", // blue
+  "#eb6834", // orange
+  "#1baf7a", // aqua
+  "#eda100", // yellow
+  "#e87ba4", // magenta
+  "#008300", // green
+  "#4a3aa7", // violet
+  "#e34948", // red
 ];
 
 /**
@@ -20,10 +20,9 @@ const CATEGORICAL = [
  */
 function overflowColor(index) {
   const hue = (index * 47) % 360;
-  return { light: `hsl(${hue} 65% 45%)`, dark: `hsl(${hue} 70% 65%)` };
+  return `hsl(${hue} 65% 45%)`;
 }
 
-export function colorForIndex(index, isDark) {
-  const entry = CATEGORICAL[index] ?? overflowColor(index);
-  return isDark ? entry.dark : entry.light;
+export function colorForIndex(index) {
+  return CATEGORICAL[index] ?? overflowColor(index);
 }

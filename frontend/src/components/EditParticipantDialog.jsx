@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ModalOverlay, Modal, Dialog, Heading, FileTrigger, Button as AriaButton } from "react-aria-components";
-import { XClose, Camera01, Trash02, AlertCircle } from "@untitledui/icons";
+import { X, Camera, Trash2, AlertCircle } from "lucide-react";
 import { updateParticipant, participantImageUrl } from "../api.js";
 import { useToast } from "./ui/ToastProvider.jsx";
 import Button from "./ui/Button.jsx";
@@ -78,30 +78,30 @@ export default function EditParticipantDialog({ participant, isOpen, onOpenChang
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       isDismissable={!submitting}
-      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-gray-900/40 backdrop-blur-[2px] sm:items-center sm:p-4"
+      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-[#dedede]/50 backdrop-blur-[2px] sm:items-center sm:p-4"
     >
-      <Modal className="animate-modal-in relative w-full max-w-sm rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl dark:bg-gray-800">
+      <Modal className="animate-modal-in relative w-full max-w-sm rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl">
         <Dialog className="outline-none">
           {({ close }) => (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <Heading slot="title" className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                <Heading slot="title" className="text-base font-semibold text-gray-900">
                   Edit profile
                 </Heading>
                 <button
                   type="button"
                   onClick={close}
                   aria-label="Close"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                 >
-                  <XClose size={18} />
+                  <X size={18} />
                 </button>
               </div>
 
               <div className="flex items-center gap-4">
                 <FileTrigger acceptedFileTypes={["image/*"]} onSelect={handleFileSelect}>
                   <AriaButton
-                    className="group relative flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gray-300 bg-gray-50 text-gray-400 outline-none transition-colors hover:border-brand-400 hover:bg-brand-50 hover:text-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:ring-offset-gray-800 dark:hover:border-brand-400 dark:hover:bg-brand-400/10"
+                    className="group relative flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gray-300 bg-gray-100 text-gray-400 outline-none transition-colors hover:border-brand-500 hover:bg-brand-50 hover:text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
                     aria-label="Choose a photo"
                   >
                     {previewUrl ? (
@@ -113,7 +113,7 @@ export default function EditParticipantDialog({ participant, isOpen, onOpenChang
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <Camera01 size={20} />
+                      <Camera size={20} />
                     )}
                   </AriaButton>
                 </FileTrigger>
@@ -125,9 +125,9 @@ export default function EditParticipantDialog({ participant, isOpen, onOpenChang
                       setFile(null);
                       setRemoveImage(true);
                     }}
-                    className="flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    className="flex items-center gap-1.5 text-sm font-medium text-[#9c0f0f] hover:text-[#7c0c0c]"
                   >
-                    <Trash02 size={14} />
+                    <Trash2 size={14} />
                     Remove photo
                   </button>
                 )}
@@ -135,7 +135,7 @@ export default function EditParticipantDialog({ participant, isOpen, onOpenChang
                   <button
                     type="button"
                     onClick={() => setRemoveImage(false)}
-                    className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    className="text-sm font-medium text-gray-600 hover:text-gray-700"
                   >
                     Undo
                   </button>
@@ -160,7 +160,7 @@ export default function EditParticipantDialog({ participant, isOpen, onOpenChang
               </div>
 
               {error && (
-                <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
+                <p className="flex items-center gap-1.5 text-sm text-[#9c0f0f]">
                   <AlertCircle size={16} className="shrink-0" />
                   {error}
                 </p>
