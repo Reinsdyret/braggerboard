@@ -1,4 +1,4 @@
-const STARTING_RATING = 1000;
+export const STARTING_RATING = 1000;
 const K_FACTOR = 32;
 
 /**

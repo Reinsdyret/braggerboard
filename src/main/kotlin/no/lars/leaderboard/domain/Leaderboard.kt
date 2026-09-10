@@ -31,4 +31,5 @@ data class ParticipantStanding(
     val hasImage: Boolean,
     val totalWins: Int,
     val rating: Int,
+    val createdAt: Instant,
 )

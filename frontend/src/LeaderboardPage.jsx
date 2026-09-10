@@ -6,8 +6,10 @@ import { saveRecent, removeRecent } from "./recents.js";
 import { useToast } from "./components/ui/ToastProvider.jsx";
 import Button from "./components/ui/Button.jsx";
 import Card from "./components/ui/Card.jsx";
+import { computeEloTimelines, computeWinTimelines } from "./utils/contestantHistory.js";
 import Skeleton from "./components/ui/Skeleton.jsx";
 import StandingsTable from "./components/StandingsTable.jsx";
+import ContestantsChart from "./components/ContestantsChart.jsx";
 import AddParticipantForm from "./components/AddParticipantForm.jsx";
 import AddRoundForm from "./components/AddRoundForm.jsx";
 import RoundHistory from "./components/RoundHistory.jsx";
@@ -159,6 +161,25 @@ export default function LeaderboardPage() {
           matches={matches}
         />
       </div>
+
+      {leaderboard.participants.length > 0 && (
+        <div className="mb-6">
+          <Card>
+            <ContestantsChart
+              title={isElo ? "Rating over time" : "Wins over time"}
+              valueLabel={isElo ? "Rating" : "Wins"}
+              timelines={
+                isElo
+                  ? computeEloTimelines(leaderboard.participants, matches)
+                  : computeWinTimelines(leaderboard.participants, rounds)
+              }
+              emptyMessage={
+                isElo ? "Play a match to start tracking rating history." : "Add a round to start tracking wins."
+              }
+            />
+          </Card>
+        </div>
+      )}
 
       <div className="mb-6">
         <AddParticipantForm leaderboardId={leaderboardId} onAdded={refresh} />

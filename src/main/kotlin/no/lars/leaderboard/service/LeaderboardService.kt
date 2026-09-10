@@ -54,6 +54,7 @@ class LeaderboardService(
                             hasImage = it.hasImage,
                             totalWins = totalWins[it.id] ?: 0,
                             rating = 0,
+                            createdAt = it.createdAt,
                         )
                     }
                     .sortedWith(compareByDescending<ParticipantStanding> { it.totalWins }.thenBy { it.name })
@@ -70,6 +71,7 @@ class LeaderboardService(
                             hasImage = it.hasImage,
                             totalWins = 0,
                             rating = ratings[it.id] ?: EloCalculator.STARTING_RATING.toInt(),
+                            createdAt = it.createdAt,
                         )
                     }
                     .sortedWith(compareByDescending<ParticipantStanding> { it.rating }.thenBy { it.name })
