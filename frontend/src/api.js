@@ -1,107 +1,26 @@
-const API_BASE = "/api";
+import * as realApi from "./realApi.js";
+import * as mockApi from "./mockApi.js";
 
-async function handle(response) {
-  if (!response.ok) {
-    let message = `Request failed with status ${response.status}`;
-    try {
-      const body = await response.json();
-      if (body.message) message = body.message;
-    } catch {
-      // response had no JSON body
-    }
-    throw new Error(message);
-  }
-  if (response.status === 204) return null;
-  return response.json();
+const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === "true";
+const impl = USE_MOCK_API ? mockApi : realApi;
+
+if (USE_MOCK_API) {
+  console.info(
+    "[mock-api] Using in-memory test data, no backend required. Demo leaderboards: #/l/demo-elo (Elo) and #/l/demo-wins (win count).",
+  );
 }
 
-export function createLeaderboard(name, scoringMode, password) {
-  return fetch(`${API_BASE}/leaderboards`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, scoringMode, password }),
-  }).then(handle);
-}
-
-export function getLeaderboard(id) {
-  return fetch(`${API_BASE}/leaderboards/${id}`, { cache: "no-store" }).then(handle);
-}
-
-export function deleteLeaderboard(id, password) {
-  return fetch(`${API_BASE}/leaderboards/${id}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password }),
-  }).then(handle);
-}
-
-export function addParticipant(leaderboardId, name, imageFile) {
-  const formData = new FormData();
-  formData.append("name", name);
-  if (imageFile) formData.append("image", imageFile);
-
-  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/participants`, {
-    method: "POST",
-    body: formData,
-  }).then(handle);
-}
-
-export function deleteParticipant(participantId) {
-  return fetch(`${API_BASE}/participants/${participantId}`, { method: "DELETE" }).then(handle);
-}
-
-export function updateParticipant(participantId, { name, imageFile, removeImage } = {}) {
-  const formData = new FormData();
-  if (name !== undefined && name !== null) formData.append("name", name);
-  if (imageFile) formData.append("image", imageFile);
-  if (removeImage) formData.append("removeImage", "true");
-
-  return fetch(`${API_BASE}/participants/${participantId}`, {
-    method: "PUT",
-    body: formData,
-  }).then(handle);
-}
-
-export function getParticipantChanges(participantId) {
-  return fetch(`${API_BASE}/participants/${participantId}/changes`, { cache: "no-store" }).then(handle);
-}
-
-export function addRound(leaderboardId, label, results) {
-  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/rounds`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ label: label || null, results }),
-  }).then(handle);
-}
-
-export function getRounds(leaderboardId) {
-  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/rounds`, { cache: "no-store" }).then(handle);
-}
-
-export function addMatch(leaderboardId, teamA, teamB, outcome) {
-  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/matches`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ teamA, teamB, outcome }),
-  }).then(handle);
-}
-
-export function getMatches(leaderboardId) {
-  return fetch(`${API_BASE}/leaderboards/${leaderboardId}/matches`, { cache: "no-store" }).then(handle);
-}
-
-export function updateMatch(matchId, teamA, teamB, outcome) {
-  return fetch(`${API_BASE}/matches/${matchId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ teamA, teamB, outcome }),
-  }).then(handle);
-}
-
-export function deleteMatch(matchId) {
-  return fetch(`${API_BASE}/matches/${matchId}`, { method: "DELETE" }).then(handle);
-}
-
-export function participantImageUrl(participantId) {
-  return `${API_BASE}/participants/${participantId}/image`;
-}
+export const createLeaderboard = impl.createLeaderboard;
+export const getLeaderboard = impl.getLeaderboard;
+export const deleteLeaderboard = impl.deleteLeaderboard;
+export const addParticipant = impl.addParticipant;
+export const deleteParticipant = impl.deleteParticipant;
+export const updateParticipant = impl.updateParticipant;
+export const getParticipantChanges = impl.getParticipantChanges;
+export const addRound = impl.addRound;
+export const getRounds = impl.getRounds;
+export const addMatch = impl.addMatch;
+export const getMatches = impl.getMatches;
+export const updateMatch = impl.updateMatch;
+export const deleteMatch = impl.deleteMatch;
+export const participantImageUrl = impl.participantImageUrl;
