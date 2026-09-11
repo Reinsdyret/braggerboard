@@ -30,7 +30,11 @@ export default function Avatar({ participant, size = "md", rankColor }) {
   return (
     <KildenAvatar className={cx(sizeClass, ringClass)}>
       {participant.hasImage && (
-        <AvatarImage src={participantImageUrl(participant.id)} alt={participant.name} />
+        <AvatarImage
+          src={participantImageUrl(participant.id)}
+          alt={participant.name}
+          className="object-cover"
+        />
       )}
       <AvatarFallback className="bg-accent-background-tinted font-semibold text-accent-text-default">
         {initials(participant.name)}
