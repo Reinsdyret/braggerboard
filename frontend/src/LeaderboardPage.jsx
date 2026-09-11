@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowNarrowLeft, Copy01, AlertCircle, Trash02 } from "@untitledui/icons";
+import { ArrowLeft, Copy, AlertCircle, Trash2 } from "lucide-react";
+import { Button, Card, CardContent, Skeleton } from "@kilden/designsystem";
 import { deleteParticipant, getLeaderboard, getRounds, getMatches, deleteMatch } from "./api.js";
 import { saveRecent, removeRecent } from "./recents.js";
 import { useToast } from "./components/ui/ToastProvider.jsx";
-import Button from "./components/ui/Button.jsx";
-import Card from "./components/ui/Card.jsx";
 import { computeEloTimelines, computeWinTimelines } from "./utils/contestantHistory.js";
-import Skeleton from "./components/ui/Skeleton.jsx";
 import StandingsTable from "./components/StandingsTable.jsx";
 import ContestantsChart from "./components/ContestantsChart.jsx";
 import AddParticipantForm from "./components/AddParticipantForm.jsx";
@@ -89,11 +87,11 @@ export default function LeaderboardPage() {
   if (loadError && !leaderboard) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center sm:px-6">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500 dark:bg-red-400/10">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-danger-background-tinted text-danger-text-default">
           <AlertCircle size={22} />
         </div>
-        <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">{loadError}</p>
-        <a href="#/" className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+        <p className="mb-4 text-sm text-neutral-text-subtle">{loadError}</p>
+        <a href="#/" className="text-sm font-semibold text-neutral-text-default hover:underline">
           ← Back home
         </a>
       </div>
@@ -117,39 +115,42 @@ export default function LeaderboardPage() {
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
       <a
         href="#/"
-        className="mb-3 inline-flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+        className="mb-3 inline-flex items-center gap-1 text-sm text-neutral-text-subtle transition-colors hover:text-neutral-text-default"
       >
-        <ArrowNarrowLeft size={16} />
+        <ArrowLeft size={16} />
         All leaderboards
       </a>
       <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100">
+        <h1 className="text-2xl font-bold tracking-tight text-neutral-text-default sm:text-3xl">
           {leaderboard.name}
         </h1>
         {isElo && (
-          <span className="rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-400/10 dark:text-brand-300">
+          <span className="rounded-full bg-accent-background-tinted px-2.5 py-1 text-xs font-semibold text-accent-text-default">
             Elo rating
           </span>
         )}
         <Button
-          variant="danger"
+          variant="destructive"
           size="sm"
-          iconLeading={Trash02}
-          onPress={() => setDeletingLeaderboard(true)}
-          className="ml-auto"
+          onClick={() => setDeletingLeaderboard(true)}
+          className="ml-auto gap-1.5"
         >
+          <Trash2 size={16} />
           Delete leaderboard
         </Button>
       </div>
 
-      <Card className="mb-6 flex items-center justify-between gap-3 !p-3.5 sm:!p-4">
-        <span className="min-w-0 truncate text-sm text-gray-500 dark:text-gray-400">
-          <span className="sm:hidden">Share this leaderboard</span>
-          <span className="hidden sm:inline">Share this link so others can view and update this leaderboard</span>
-        </span>
-        <Button variant="secondary" size="sm" iconLeading={Copy01} onPress={copyLink} className="shrink-0">
-          Copy link
-        </Button>
+      <Card className="mb-6">
+        <CardContent className="flex items-center justify-between gap-3 !py-3.5">
+          <span className="min-w-0 truncate text-sm text-neutral-text-subtle">
+            <span className="sm:hidden">Share this leaderboard</span>
+            <span className="hidden sm:inline">Share this link so others can view and update this leaderboard</span>
+          </span>
+          <Button variant="secondary" size="sm" onClick={copyLink} className="shrink-0 gap-1.5">
+            <Copy size={16} />
+            Copy link
+          </Button>
+        </CardContent>
       </Card>
 
       <div className="mb-6">
@@ -165,18 +166,20 @@ export default function LeaderboardPage() {
       {leaderboard.participants.length > 0 && (
         <div className="mb-6">
           <Card>
-            <ContestantsChart
-              title={isElo ? "Rating over time" : "Wins over time"}
-              valueLabel={isElo ? "Rating" : "Wins"}
-              timelines={
-                isElo
-                  ? computeEloTimelines(leaderboard.participants, matches)
-                  : computeWinTimelines(leaderboard.participants, rounds)
-              }
-              emptyMessage={
-                isElo ? "Play a match to start tracking rating history." : "Add a round to start tracking wins."
-              }
-            />
+            <CardContent className="pt-6">
+              <ContestantsChart
+                title={isElo ? "Rating over time" : "Wins over time"}
+                valueLabel={isElo ? "Rating" : "Wins"}
+                timelines={
+                  isElo
+                    ? computeEloTimelines(leaderboard.participants, matches)
+                    : computeWinTimelines(leaderboard.participants, rounds)
+                }
+                emptyMessage={
+                  isElo ? "Play a match to start tracking rating history." : "Add a round to start tracking wins."
+                }
+              />
+            </CardContent>
           </Card>
         </div>
       )}
@@ -201,7 +204,7 @@ export default function LeaderboardPage() {
         )}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+      <h2 className="mb-3 text-sm font-semibold tracking-wide text-neutral-text-subtle uppercase">
         {isElo ? "Match history" : "Round history"}
       </h2>
       {isElo ? (

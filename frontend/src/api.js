@@ -6,7 +6,7 @@ const impl = USE_MOCK_API ? mockApi : realApi;
 
 if (USE_MOCK_API) {
   console.info(
-    "[mock-api] Using in-memory test data, no backend required. Demo leaderboards: #/l/demo-elo (Elo) and #/l/demo-wins (win count).",
+    "[mock-api] Using in-memory test data, no backend required. Demo leaderboards: #/l/demo-elo (Elo), #/l/demo-elo-2v2 (Elo, 2v2), and #/l/demo-wins (win count).",
   );
 }
 

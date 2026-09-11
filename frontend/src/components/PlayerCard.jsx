@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ModalOverlay, Modal, Dialog, Heading } from "react-aria-components";
-import { XClose, TrendUp01, TrendDown01, Users01, Pencil01 } from "@untitledui/icons";
+import { Dialog, DialogContent, DialogTitle } from "@kilden/designsystem";
+import { TrendingUp, TrendingDown, Users, Pencil } from "lucide-react";
 import { getParticipantChanges } from "../api.js";
 import Avatar from "./Avatar.jsx";
 import RatingHistoryChart from "./RatingHistoryChart.jsx";
@@ -13,23 +13,23 @@ import { cx } from "../utils/cx.js";
 
 function StatBox({ label, value }) {
   return (
-    <div className="rounded-xl bg-gray-50 py-3 text-center dark:bg-gray-700/50">
-      <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{value}</p>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+    <div className="bg-neutral-background-tinted py-3 text-center">
+      <p className="text-lg font-bold text-neutral-text-default">{value}</p>
+      <p className="text-xs text-neutral-text-subtle">{label}</p>
     </div>
   );
 }
 
 function OpponentRow({ icon: Icon, iconClass, opponent }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+    <div className="flex items-center gap-3 border border-neutral-border-subtle p-3">
       <div className={cx("flex h-9 w-9 shrink-0 items-center justify-center rounded-full", iconClass)}>
         <Icon size={16} />
       </div>
-      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+      <p className="min-w-0 flex-1 truncate text-sm font-semibold text-neutral-text-default">
         {opponent.name}
       </p>
-      <p className="shrink-0 text-sm font-medium text-gray-500 dark:text-gray-400">
+      <p className="shrink-0 text-sm font-medium text-neutral-text-subtle">
         {opponent.wins}-{opponent.losses}
         {opponent.draws ? `-${opponent.draws}` : ""}
       </p>
@@ -40,7 +40,7 @@ function OpponentRow({ icon: Icon, iconClass, opponent }) {
 function OpponentGroup({ title, icon, iconClass, opponents }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">{title}</p>
+      <p className="text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">{title}</p>
       {opponents.map((opponent) => (
         <OpponentRow key={opponent.id} icon={icon} iconClass={iconClass} opponent={opponent} />
       ))}
@@ -79,104 +79,86 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
   const worstGroup = hasClearSpread ? opponents.filter((o) => o.net === bottomNet) : [];
 
   return (
-    <ModalOverlay
-      isOpen={isOpen}
-      onOpenChange={onOpenChange}
-      isDismissable
-      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-gray-900/40 backdrop-blur-[2px] sm:items-center sm:p-4"
-    >
-      <Modal className="animate-modal-in relative max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-t-2xl bg-white p-6 shadow-[var(--shadow-popover)] outline-none sm:rounded-2xl dark:bg-gray-800">
-        <Dialog className="outline-none">
-          {({ close }) => (
-            <>
-              <button
-                onClick={close}
-                aria-label="Close"
-                className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-              >
-                <XClose size={18} />
-              </button>
-              <button
-                onClick={() => {
-                  close();
-                  onEdit(participant);
-                }}
-                aria-label="Edit profile"
-                className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-              >
-                <Pencil01 size={16} />
-              </button>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <button
+          onClick={() => {
+            onOpenChange(false);
+            onEdit(participant);
+          }}
+          aria-label="Edit profile"
+          className="absolute top-4 left-4 flex h-8 w-8 items-center justify-center rounded-lg text-neutral-text-subtle hover:bg-neutral-surface-tinted hover:text-neutral-text-default"
+        >
+          <Pencil size={16} />
+        </button>
 
-              <div className="mb-5 flex flex-col items-center text-center">
-                <Avatar participant={participant} size="lg" />
-                <Heading slot="title" className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
-                  {participant.name}
-                </Heading>
-                <div className="mt-1 flex items-center gap-2">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {scoringMode === "ELO" ? `${participant.rating} rating` : `${participant.totalWins} wins`}
-                  </p>
-                  <StreakBadge streak={streak} />
-                </div>
+        <div className="mb-5 flex flex-col items-center text-center">
+          <Avatar participant={participant} size="lg" />
+          <DialogTitle className="mt-3 text-lg font-bold text-neutral-text-default">
+            {participant.name}
+          </DialogTitle>
+          <div className="mt-1 flex items-center gap-2">
+            <p className="text-sm text-neutral-text-subtle">
+              {scoringMode === "ELO" ? `${participant.rating} rating` : `${participant.totalWins} wins`}
+            </p>
+            <StreakBadge streak={streak} />
+          </div>
+        </div>
+
+        {scoringMode === "ELO" && stats && (
+          <>
+            <div className={cx("mb-5 grid gap-2", stats.draws > 0 ? "grid-cols-4" : "grid-cols-3")}>
+              <StatBox label="Played" value={stats.played} />
+              <StatBox label="Won" value={stats.wins} />
+              <StatBox label="Lost" value={stats.losses} />
+              {stats.draws > 0 && <StatBox label="Drawn" value={stats.draws} />}
+            </div>
+
+            <div className="mb-5">
+              <p className="mb-2 text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">
+                Rating history
+              </p>
+              <RatingHistoryChart history={ratingHistory} />
+            </div>
+
+            {opponents.length === 0 && (
+              <p className="text-center text-sm text-neutral-text-subtle">No matches recorded yet.</p>
+            )}
+
+            {opponents.length > 0 && hasClearSpread && (
+              <div className="flex flex-col gap-4">
+                <OpponentGroup
+                  title="Best against"
+                  icon={TrendingUp}
+                  iconClass="bg-success-background-tinted text-success-text-default"
+                  opponents={bestGroup}
+                />
+                <OpponentGroup
+                  title="Toughest opponent"
+                  icon={TrendingDown}
+                  iconClass="bg-danger-background-tinted text-danger-text-default"
+                  opponents={worstGroup}
+                />
               </div>
+            )}
 
-              {scoringMode === "ELO" && stats && (
-                <>
-                  <div className={cx("mb-5 grid gap-2", stats.draws > 0 ? "grid-cols-4" : "grid-cols-3")}>
-                    <StatBox label="Played" value={stats.played} />
-                    <StatBox label="Won" value={stats.wins} />
-                    <StatBox label="Lost" value={stats.losses} />
-                    {stats.draws > 0 && <StatBox label="Drawn" value={stats.draws} />}
-                  </div>
+            {opponents.length > 0 && !hasClearSpread && (
+              <OpponentGroup
+                title="Head to head"
+                icon={Users}
+                iconClass="bg-accent-background-tinted text-accent-text-default"
+                opponents={opponents}
+              />
+            )}
+          </>
+        )}
 
-                  <div className="mb-5">
-                    <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                      Rating history
-                    </p>
-                    <RatingHistoryChart history={ratingHistory} />
-                  </div>
-
-                  {opponents.length === 0 && (
-                    <p className="text-center text-sm text-gray-500 dark:text-gray-400">No matches recorded yet.</p>
-                  )}
-
-                  {opponents.length > 0 && hasClearSpread && (
-                    <div className="flex flex-col gap-4">
-                      <OpponentGroup
-                        title="Best against"
-                        icon={TrendUp01}
-                        iconClass="bg-green-100 text-green-600 dark:bg-green-400/10 dark:text-green-400"
-                        opponents={bestGroup}
-                      />
-                      <OpponentGroup
-                        title="Toughest opponent"
-                        icon={TrendDown01}
-                        iconClass="bg-red-100 text-red-500 dark:bg-red-400/10 dark:text-red-400"
-                        opponents={worstGroup}
-                      />
-                    </div>
-                  )}
-
-                  {opponents.length > 0 && !hasClearSpread && (
-                    <OpponentGroup
-                      title="Head to head"
-                      icon={Users01}
-                      iconClass="bg-brand-100 text-brand-600 dark:bg-brand-400/10 dark:text-brand-300"
-                      opponents={opponents}
-                    />
-                  )}
-                </>
-              )}
-
-              {changes.length > 0 && (
-                <div className={scoringMode === "ELO" ? "mt-5" : ""}>
-                  <ChangeLog changes={changes} />
-                </div>
-              )}
-            </>
-          )}
-        </Dialog>
-      </Modal>
-    </ModalOverlay>
+        {changes.length > 0 && (
+          <div className={scoringMode === "ELO" ? "mt-5" : ""}>
+            <ChangeLog changes={changes} />
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

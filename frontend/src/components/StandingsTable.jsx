@@ -1,20 +1,31 @@
 import { useState } from "react";
-import { Trash02, Users01 } from "@untitledui/icons";
+import { Trash2, Users } from "lucide-react";
 import Avatar from "./Avatar.jsx";
-import Badge from "./ui/Badge.jsx";
 import ConfirmDialog from "./ui/ConfirmDialog.jsx";
 import EmptyState from "./ui/EmptyState.jsx";
 import StreakBadge from "./StreakBadge.jsx";
+import { cx } from "../utils/cx.js";
 import { computeStreak } from "../utils/streak.js";
 
 const RANK_COLOR = { 1: "gold", 2: "silver", 3: "bronze" };
+const RANK_BADGE_CLASS = {
+  gold: "bg-amber-100 text-amber-800",
+  silver: "bg-gray-200 text-gray-700",
+  bronze: "bg-orange-100 text-orange-800",
+};
 
 function RankBadge({ rank }) {
   const color = RANK_COLOR[rank];
-  if (color) {
-    return <Badge color={color}>{rank}</Badge>;
-  }
-  return <span className="w-6 text-center text-sm font-semibold text-gray-400 dark:text-gray-500">{rank}</span>;
+  return (
+    <span
+      className={cx(
+        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
+        color ? RANK_BADGE_CLASS[color] : "text-neutral-text-subtle",
+      )}
+    >
+      {rank}
+    </span>
+  );
 }
 
 export default function StandingsTable({ participants, onDelete, onSelect, scoringMode = "WIN_COUNT", matches = [] }) {
@@ -24,7 +35,7 @@ export default function StandingsTable({ participants, onDelete, onSelect, scori
   if (participants.length === 0) {
     return (
       <EmptyState
-        icon={Users01}
+        icon={Users}
         title="No participants yet"
         description="Add someone below to get started."
       />
@@ -33,7 +44,7 @@ export default function StandingsTable({ participants, onDelete, onSelect, scori
 
   return (
     <>
-      <ul className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[var(--shadow-card)] dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+      <ul className="divide-y divide-neutral-border-subtle border border-neutral-border-subtle bg-neutral-surface-default">
         {participants.map((p, index) => {
           const rank = index + 1;
           const score = scoringMode === "ELO" ? p.rating : p.totalWins;
@@ -43,23 +54,23 @@ export default function StandingsTable({ participants, onDelete, onSelect, scori
               <button
                 type="button"
                 onClick={() => onSelect(p)}
-                className="grid flex-1 grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 sm:px-5 sm:py-3.5 dark:hover:bg-gray-700/50"
+                className="grid flex-1 grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-surface-tinted sm:px-5 sm:py-3.5"
               >
                 <RankBadge rank={rank} />
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar participant={p} rankColor={RANK_COLOR[rank]} />
-                  <span className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{p.name}</span>
+                  <span className="truncate text-sm font-medium text-neutral-text-default">{p.name}</span>
                   <StreakBadge streak={streak} size="sm" />
                 </div>
-                <span className="text-sm font-bold text-brand-600 dark:text-brand-400">{score}</span>
+                <span className="text-sm font-bold text-neutral-text-default">{score}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setPendingDelete(p)}
-                className="mr-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500 active:bg-red-100 sm:mr-5 dark:text-gray-600 dark:hover:bg-red-400/10 dark:hover:text-red-400"
+                className="mr-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-text-subtle transition-colors hover:bg-danger-background-tinted hover:text-danger-text-default active:bg-danger-surface-hover sm:mr-5"
                 aria-label={`Remove ${p.name}`}
               >
-                <Trash02 size={16} />
+                <Trash2 size={16} />
               </button>
             </li>
           );

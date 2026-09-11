@@ -1,21 +1,19 @@
-import { useIsDarkMode } from "../utils/useIsDarkMode.js";
-
 const WIDTH = 300;
 const HEIGHT = 90;
 const PAD_Y = 10;
 
 const COLORS = {
-  light: { line: "#6d4fe0", up: "#16a34a", down: "#dc2626" },
-  dark: { line: "#a78bfa", up: "#4ade80", down: "#f87171" },
+  line: "var(--color-accent-border-default)",
+  up: "var(--color-success-base-default)",
+  down: "var(--color-danger-base-default)",
 };
 
 export default function RatingHistoryChart({ history, startingRating = 1000 }) {
-  const isDark = useIsDarkMode();
-  const { line: lineColor, up: upColor, down: downColor } = isDark ? COLORS.dark : COLORS.light;
+  const { line: lineColor, up: upColor, down: downColor } = COLORS;
 
   if (history.length === 0) {
     return (
-      <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+      <p className="text-center text-sm text-neutral-text-subtle">
         Play a match to start tracking rating history.
       </p>
     );
@@ -66,7 +64,7 @@ export default function RatingHistoryChart({ history, startingRating = 1000 }) {
         />
         <circle cx={lastX} cy={lastY} r="3.5" fill={trendColor} />
       </svg>
-      <div className="mt-1 flex justify-between text-xs text-gray-400 dark:text-gray-500">
+      <div className="mt-1 flex justify-between text-xs text-neutral-text-subtle">
         <span>Low {min}</span>
         <span>High {max}</span>
       </div>

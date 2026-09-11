@@ -1,4 +1,4 @@
-import { TrendUp01, TrendDown01 } from "@untitledui/icons";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import { cx } from "../utils/cx.js";
 
 export default function StreakBadge({ streak, size = "md" }) {
@@ -12,12 +12,12 @@ export default function StreakBadge({ streak, size = "md" }) {
       className={cx(
         "inline-flex shrink-0 items-center rounded-full font-semibold",
         isWin
-          ? "bg-green-100 text-green-700 dark:bg-green-400/10 dark:text-green-400"
-          : "bg-red-100 text-red-600 dark:bg-red-400/10 dark:text-red-400",
+          ? "bg-success-background-tinted text-success-text-default"
+          : "bg-danger-background-tinted text-danger-text-default",
         sizeClass,
       )}
     >
-      {isWin ? <TrendUp01 size={size === "sm" ? 11 : 12} /> : <TrendDown01 size={size === "sm" ? 11 : 12} />}
+      {isWin ? <TrendingUp size={size === "sm" ? 11 : 12} /> : <TrendingDown size={size === "sm" ? 11 : 12} />}
       {streak.length}
       {isWin ? "W" : "L"}
     </span>

@@ -1,3 +1,4 @@
+import { Avatar as KildenAvatar, AvatarImage, AvatarFallback } from "@kilden/designsystem";
 import { participantImageUrl } from "../api.js";
 import { cx } from "../utils/cx.js";
 
@@ -24,29 +25,16 @@ function initials(name) {
 
 export default function Avatar({ participant, size = "md", rankColor }) {
   const sizeClass = SIZES[size];
-  const ringClass = rankColor
-    ? cx("ring-2 ring-offset-2 dark:ring-offset-gray-800", RING_COLORS[rankColor])
-    : "";
-
-  if (participant.hasImage) {
-    return (
-      <img
-        className={cx("shrink-0 rounded-full object-cover", sizeClass, ringClass)}
-        src={participantImageUrl(participant.id)}
-        alt={participant.name}
-      />
-    );
-  }
+  const ringClass = rankColor ? cx("ring-2 ring-offset-2", RING_COLORS[rankColor]) : "";
 
   return (
-    <div
-      className={cx(
-        "flex shrink-0 items-center justify-center rounded-full bg-brand-100 font-semibold text-brand-700 dark:bg-brand-400/15 dark:text-brand-300",
-        sizeClass,
-        ringClass,
+    <KildenAvatar className={cx(sizeClass, ringClass)}>
+      {participant.hasImage && (
+        <AvatarImage src={participantImageUrl(participant.id)} alt={participant.name} />
       )}
-    >
-      {initials(participant.name)}
-    </div>
+      <AvatarFallback className="bg-accent-background-tinted font-semibold text-accent-text-default">
+        {initials(participant.name)}
+      </AvatarFallback>
+    </KildenAvatar>
   );
 }

@@ -1,27 +1,44 @@
 @import "tailwindcss";
+@import "@kilden/designsystem/styles.css";
 
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Re-register Kilden's runtime CSS custom properties as Tailwind theme colors so our own
+     build generates every utility we need (hover:, focus-visible:, etc.) - Kilden's own
+     precompiled CSS only ships the exact class combinations its own components happened to use. */
+  --color-neutral-background-default: var(--color-neutral-background-default);
+  --color-neutral-background-tinted: var(--color-neutral-background-tinted);
+  --color-neutral-surface-default: var(--color-neutral-surface-default);
+  --color-neutral-surface-tinted: var(--color-neutral-surface-tinted);
+  --color-neutral-surface-hover: var(--color-neutral-surface-hover);
+  --color-neutral-surface-active: var(--color-neutral-surface-active);
+  --color-neutral-border-subtle: var(--color-neutral-border-subtle);
+  --color-neutral-border-default: var(--color-neutral-border-default);
+  --color-neutral-border-strong: var(--color-neutral-border-strong);
+  --color-neutral-text-subtle: var(--color-neutral-text-subtle);
+  --color-neutral-text-default: var(--color-neutral-text-default);
+  --color-neutral-base-default: var(--color-neutral-base-default);
+  --color-neutral-base-hover: var(--color-neutral-base-hover);
+  --color-neutral-base-contrast-default: var(--color-neutral-base-contrast-default);
 
-  --color-brand-50: #f5f3ff;
-  --color-brand-100: #ede9fe;
-  --color-brand-200: #ddd6fe;
-  --color-brand-300: #c4b5fd;
-  --color-brand-400: #a78bfa;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #6d4fe0;
-  --color-brand-700: #5a3fc0;
-  --color-brand-800: #4a339c;
-  --color-brand-900: #3d2c7d;
-  --color-brand-950: #251a52;
+  --color-dominant-background-tinted: var(--color-dominant-background-tinted);
+  --color-dominant-border-default: var(--color-dominant-border-default);
 
-  --color-gold-500: #eab308;
-  --color-silver-400: #9ca3af;
-  --color-bronze-500: #c2703d;
+  --color-accent-background-tinted: var(--color-accent-background-tinted);
+  --color-accent-border-default: var(--color-accent-border-default);
+  --color-accent-text-default: var(--color-accent-text-default);
 
-  --shadow-card: 0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.06);
-  --shadow-card-hover: 0 4px 8px -2px rgb(16 24 40 / 0.06), 0 2px 4px -2px rgb(16 24 40 / 0.04);
-  --shadow-popover: 0 12px 16px -4px rgb(16 24 40 / 0.08), 0 4px 6px -2px rgb(16 24 40 / 0.03);
+  --color-success-background-tinted: var(--color-success-background-tinted);
+  --color-success-surface-hover: var(--color-success-surface-hover);
+  --color-success-text-default: var(--color-success-text-default);
+  --color-success-base-default: var(--color-success-base-default);
+
+  --color-warning-background-tinted: var(--color-warning-background-tinted);
+  --color-warning-text-default: var(--color-warning-text-default);
+
+  --color-danger-background-tinted: var(--color-danger-background-tinted);
+  --color-danger-surface-hover: var(--color-danger-surface-hover);
+  --color-danger-text-default: var(--color-danger-text-default);
+  --color-danger-base-default: var(--color-danger-base-default);
 
   --animate-fade-in: fade-in 0.15s ease-out;
   --animate-overlay-in: overlay-in 0.2s ease-out;
@@ -69,6 +86,6 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
+    @apply bg-neutral-background-default text-neutral-text-default antialiased;
   }
 }

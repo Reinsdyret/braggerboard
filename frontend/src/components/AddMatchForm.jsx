@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Zap, AlertCircle } from "@untitledui/icons";
+import { Zap, AlertCircle } from "lucide-react";
+import { Button, Card, CardContent } from "@kilden/designsystem";
 import { addMatch } from "../api.js";
 import { useToast } from "./ui/ToastProvider.jsx";
-import Button from "./ui/Button.jsx";
-import Card from "./ui/Card.jsx";
 import MatchTeamPicker from "./MatchTeamPicker.jsx";
 import { MAX_TEAM_SIZE } from "../constants.js";
 import { cx } from "../utils/cx.js";
@@ -58,78 +57,82 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
   if (participants.length < 2) {
     return (
       <Card>
-        <div className="mb-1 flex items-center gap-2">
-          <Zap size={18} className="text-brand-600" />
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Add match</h3>
-        </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Add at least 2 participants to record a match.</p>
+        <CardContent className="pt-6">
+          <div className="mb-1 flex items-center gap-2">
+            <Zap size={18} className="text-neutral-text-default" />
+            <h3 className="text-sm font-semibold text-neutral-text-default">Add match</h3>
+          </div>
+          <p className="text-sm text-neutral-text-subtle">Add at least 2 participants to record a match.</p>
+        </CardContent>
       </Card>
     );
   }
 
   return (
     <Card>
-      <div className="mb-4 flex items-center gap-2">
-        <Zap size={18} className="text-brand-600" />
-        <h3 className="text-sm font-semibold text-gray-700">Add match</h3>
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div>
-          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
-            Team size
-          </p>
-          <div className="grid grid-cols-4 gap-2">
-            {TEAM_SIZES.map((size) => (
-              <button
-                key={size}
-                type="button"
-                onClick={() => handleTeamSizeChange(size)}
-                className={cx(
-                  "rounded-lg border py-2 text-sm font-semibold transition-colors",
-                  teamSize === size
-                    ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-400/10 dark:text-brand-300"
-                    : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-600",
-                )}
-              >
-                {size}v{size}
-              </button>
-            ))}
-          </div>
+      <CardContent className="pt-6">
+        <div className="mb-4 flex items-center gap-2">
+          <Zap size={18} className="text-neutral-text-default" />
+          <h3 className="text-sm font-semibold text-neutral-text-default">Add match</h3>
         </div>
 
-        {participants.length < teamSize * 2 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Add at least {teamSize * 2} participants to record a {teamSize}v{teamSize} match.
-          </p>
-        ) : (
-          <MatchTeamPicker
-            participants={participants}
-            teamA={teamA}
-            teamB={teamB}
-            outcome={outcome}
-            onTeamAChange={setTeamA}
-            onTeamBChange={setTeamB}
-            onOutcomeChange={setOutcome}
-          />
-        )}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <p className="mb-2 text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">
+              Team size
+            </p>
+            <div className="grid grid-cols-4 gap-2">
+              {TEAM_SIZES.map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => handleTeamSizeChange(size)}
+                  className={cx(
+                    "rounded-lg border py-2 text-sm font-semibold transition-colors",
+                    teamSize === size
+                      ? "border-neutral-border-strong bg-neutral-base-default text-neutral-base-contrast-default"
+                      : "border-neutral-border-subtle text-neutral-text-subtle hover:border-neutral-border-default",
+                  )}
+                >
+                  {size}v{size}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        <Button
-          type="submit"
-          isLoading={submitting}
-          isDisabled={!canSubmit || participants.length < teamSize * 2}
-          className="self-start"
-        >
-          Save match
-        </Button>
+          {participants.length < teamSize * 2 ? (
+            <p className="text-sm text-neutral-text-subtle">
+              Add at least {teamSize * 2} participants to record a {teamSize}v{teamSize} match.
+            </p>
+          ) : (
+            <MatchTeamPicker
+              participants={participants}
+              teamA={teamA}
+              teamB={teamB}
+              outcome={outcome}
+              onTeamAChange={setTeamA}
+              onTeamBChange={setTeamB}
+              onOutcomeChange={setOutcome}
+            />
+          )}
 
-        {error && (
-          <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
-            <AlertCircle size={16} className="shrink-0" />
-            {error}
-          </p>
-        )}
-      </form>
+          <Button
+            type="submit"
+            isLoading={submitting}
+            disabled={!canSubmit || participants.length < teamSize * 2}
+            className="self-start"
+          >
+            Save match
+          </Button>
+
+          {error && (
+            <p className="flex items-center gap-1.5 text-sm text-danger-text-default">
+              <AlertCircle size={16} className="shrink-0" />
+              {error}
+            </p>
+          )}
+        </form>
+      </CardContent>
     </Card>
   );
 }

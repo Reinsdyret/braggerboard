@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trophy01, ChevronRight, AlertCircle, TrendUp01 } from "@untitledui/icons";
+import { Trophy, ChevronRight, TrendingUp } from "lucide-react";
+import { Button, Card, CardContent, Input } from "@kilden/designsystem";
 import { createLeaderboard } from "./api.js";
 import { loadRecents } from "./recents.js";
-import Button from "./components/ui/Button.jsx";
-import Card from "./components/ui/Card.jsx";
-import Input from "./components/ui/Input.jsx";
 import { cx } from "./utils/cx.js";
 
 const SCORING_MODES = [
@@ -13,13 +11,13 @@ const SCORING_MODES = [
     value: "WIN_COUNT",
     label: "Win count",
     description: "Track how many times each person won",
-    icon: Trophy01,
+    icon: Trophy,
   },
   {
     value: "ELO",
     label: "Elo rating",
     description: "Rating rises and falls based on who you beat",
-    icon: TrendUp01,
+    icon: TrendingUp,
   },
 ];
 
@@ -29,30 +27,25 @@ function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
       type="button"
       onClick={onSelect}
       className={cx(
-        "flex flex-1 items-start gap-3 rounded-xl border p-3.5 text-left transition-colors",
+        "flex flex-1 items-start gap-3 border p-3.5 text-left transition-colors",
         selected
-          ? "border-brand-500 bg-brand-50/60 ring-1 ring-brand-500 dark:bg-brand-400/10"
-          : "border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600",
+          ? "border-neutral-border-strong"
+          : "border-neutral-border-subtle bg-neutral-surface-default hover:border-neutral-border-default",
       )}
     >
       <div
         className={cx(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          selected ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400",
+          selected
+            ? "bg-neutral-base-default text-neutral-base-contrast-default"
+            : "bg-neutral-surface-tinted text-neutral-text-subtle",
         )}
       >
         <Icon size={16} />
       </div>
       <div className="min-w-0">
-        <p
-          className={cx(
-            "text-sm font-semibold",
-            selected ? "text-brand-700 dark:text-brand-300" : "text-gray-800 dark:text-gray-200",
-          )}
-        >
-          {label}
-        </p>
-        {description && <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{description}</p>}
+        <p className="text-sm font-semibold text-neutral-text-default">{label}</p>
+        {description && <p className="mt-0.5 text-xs text-neutral-text-subtle">{description}</p>}
       </div>
     </button>
   );
@@ -88,86 +81,70 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 -top-40 -z-10 flex justify-center blur-3xl">
-        <div className="aspect-square w-[36rem] rounded-full bg-gradient-to-tr from-brand-200 to-brand-400 opacity-40" />
-      </div>
-
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-16 sm:px-6">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-600/25">
-            <Trophy01 size={24} />
+          <div className="mb-4 flex h-12 w-12 items-center justify-center text-neutral-text-default">
+            <Trophy size={28} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl dark:text-gray-100">
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-text-default sm:text-3xl">
             Leaderboard
           </h1>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm text-neutral-text-subtle">
             Create a leaderboard, share the link, track who's winning.
           </p>
         </div>
 
         <Card>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label htmlFor="leaderboard-name" className="sr-only">
-                Leaderboard name
-              </label>
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Input
                 id="leaderboard-name"
+                label="Leaderboard name"
                 type="text"
                 placeholder="Leaderboard name, e.g. Friday Darts"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                error={Boolean(error)}
+                error={error ?? undefined}
                 required
                 autoFocus
               />
-            </div>
 
-            <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">Scoring</p>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                {SCORING_MODES.map((mode) => (
-                  <OptionCard
-                    key={mode.value}
-                    selected={scoringMode === mode.value}
-                    onSelect={() => setScoringMode(mode.value)}
-                    icon={mode.icon}
-                    label={mode.label}
-                    description={mode.description}
-                  />
-                ))}
+              <div>
+                <p className="mb-2 text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Scoring</p>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  {SCORING_MODES.map((mode) => (
+                    <OptionCard
+                      key={mode.value}
+                      selected={scoringMode === mode.value}
+                      onSelect={() => setScoringMode(mode.value)}
+                      icon={mode.icon}
+                      label={mode.label}
+                      description={mode.description}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="admin-password" className="mb-2 block text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                Admin password
-              </label>
               <Input
                 id="admin-password"
+                label="Admin password"
                 type="password"
                 placeholder="Choose a password to delete this leaderboard later"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-            </div>
 
-            <Button type="submit" size="lg" isLoading={submitting} isDisabled={!name.trim() || !password}>
-              Create leaderboard
-            </Button>
-            {error && (
-              <p className="flex items-center gap-1.5 text-sm text-red-600">
-                <AlertCircle size={16} className="shrink-0" />
-                {error}
-              </p>
-            )}
-          </form>
+              <Button type="submit" size="md" isLoading={submitting} disabled={!name.trim() || !password}>
+                Create leaderboard
+              </Button>
+            </form>
+          </CardContent>
         </Card>
 
         {recents.length > 0 && (
           <div className="mt-8">
-            <h2 className="mb-2 px-1 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+            <h2 className="mb-2 px-1 text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">
               Your recent leaderboards
             </h2>
             <div className="flex flex-col gap-2">
@@ -175,17 +152,17 @@ export default function Home() {
                 <a
                   key={r.id}
                   href={`#/l/${r.id}`}
-                  className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-[var(--shadow-card)] transition-colors hover:border-brand-300 hover:bg-brand-50/40 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-brand-500 dark:hover:bg-brand-400/10"
+                  className="group flex items-center gap-3 border border-neutral-border-subtle bg-neutral-surface-default px-4 py-3 transition-colors hover:border-neutral-border-strong hover:bg-neutral-surface-tinted"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 group-hover:bg-brand-100 group-hover:text-brand-600 dark:bg-gray-700 dark:text-gray-400 dark:group-hover:bg-brand-400/20 dark:group-hover:text-brand-400">
-                    <Trophy01 size={16} />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-surface-tinted text-neutral-text-subtle">
+                    <Trophy size={16} />
                   </div>
-                  <span className="flex-1 truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                  <span className="flex-1 truncate text-sm font-medium text-neutral-text-default">
                     {r.name}
                   </span>
                   <ChevronRight
                     size={16}
-                    className="shrink-0 text-gray-300 group-hover:text-brand-400 dark:text-gray-600"
+                    className="shrink-0 text-neutral-text-subtle group-hover:text-neutral-text-default"
                   />
                 </a>
               ))}
