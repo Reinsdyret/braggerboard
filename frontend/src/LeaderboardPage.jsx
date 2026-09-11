@@ -133,7 +133,7 @@ export default function LeaderboardPage() {
           variant="destructive"
           size="sm"
           onClick={() => setDeletingLeaderboard(true)}
-          className="ml-auto"
+          className="ml-auto gap-1.5"
         >
           <Trash2 size={16} />
           Delete leaderboard
@@ -146,7 +146,7 @@ export default function LeaderboardPage() {
             <span className="sm:hidden">Share this leaderboard</span>
             <span className="hidden sm:inline">Share this link so others can view and update this leaderboard</span>
           </span>
-          <Button variant="secondary" size="sm" onClick={copyLink} className="shrink-0">
+          <Button variant="secondary" size="sm" onClick={copyLink} className="shrink-0 gap-1.5">
             <Copy size={16} />
             Copy link
           </Button>
