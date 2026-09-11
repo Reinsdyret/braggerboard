@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Trash2, Users } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@kilden/designsystem";
 import Avatar from "./Avatar.jsx";
 import ConfirmDialog from "./ui/ConfirmDialog.jsx";
 import EmptyState from "./ui/EmptyState.jsx";
@@ -34,6 +35,17 @@ function StatCell({ value }) {
   return <div className="w-10 text-center text-sm font-semibold text-neutral-text-default">{value}</div>;
 }
 
+function HeaderCell({ label, title }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="w-10 cursor-default text-center">{label}</span>
+      </TooltipTrigger>
+      <TooltipContent side="top">{title}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 function ColumnHeaders({ isElo }) {
   return (
     <li className="flex items-center max-sm:hidden" aria-hidden="true">
@@ -47,10 +59,10 @@ function ColumnHeaders({ isElo }) {
         <span>Player</span>
         {isElo && (
           <div className="flex items-center gap-2">
-            <span className="w-10 text-center">P</span>
-            <span className="w-10 text-center">W</span>
-            <span className="w-10 text-center">L</span>
-            <span className="w-10 text-center">%</span>
+            <HeaderCell label="P" title="Played" />
+            <HeaderCell label="W" title="Won" />
+            <HeaderCell label="L" title="Lost" />
+            <HeaderCell label="%" title="Win rate" />
           </div>
         )}
         <span className="w-16 text-right">{isElo ? "Rating" : "Wins"}</span>
