@@ -5,7 +5,7 @@ export default function StreakBadge({ streak, size = "md" }) {
   if (!streak || streak.length < 2) return null;
 
   const isWin = streak.type === "win";
-  const sizeClass = size === "sm" ? "px-1.5 py-0.5 text-[11px] gap-0.5" : "px-2 py-1 text-xs gap-1";
+  const sizeClass = size === "sm" ? "px-2 py-1 text-[11px] gap-1" : "px-2.5 py-1.5 text-xs gap-1.5";
 
   return (
     <span
