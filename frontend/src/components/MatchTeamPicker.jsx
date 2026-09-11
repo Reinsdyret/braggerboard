@@ -53,7 +53,7 @@ export default function MatchTeamPicker({
           ))}
         </div>
 
-        <span className="hidden self-center text-xs font-semibold text-neutral-text-subtle sm:block">VS</span>
+        <span className="block self-center text-xs font-semibold text-neutral-text-subtle max-sm:hidden">VS</span>
 
         <div className="flex flex-1 flex-col gap-2">
           <p className="text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Team B</p>

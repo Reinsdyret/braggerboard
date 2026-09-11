@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import "@kilden/designsystem/styles.css";
+@import "tailwindcss";
 
 @theme {
   /* Re-register Kilden's runtime CSS custom properties as Tailwind theme colors so our own

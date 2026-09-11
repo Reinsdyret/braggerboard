@@ -144,7 +144,7 @@ export default function LeaderboardPage() {
         <CardContent className="flex items-center justify-between gap-3 !py-3.5">
           <span className="min-w-0 truncate text-sm text-neutral-text-subtle">
             <span className="sm:hidden">Share this leaderboard</span>
-            <span className="hidden sm:inline">Share this link so others can view and update this leaderboard</span>
+            <span className="max-sm:hidden">Share this link so others can view and update this leaderboard</span>
           </span>
           <Button variant="secondary" size="sm" onClick={copyLink} className="shrink-0 gap-1.5">
             <Copy size={16} />

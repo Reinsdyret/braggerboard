@@ -6,6 +6,7 @@ import EmptyState from "./ui/EmptyState.jsx";
 import StreakBadge from "./StreakBadge.jsx";
 import { cx } from "../utils/cx.js";
 import { computeStreak } from "../utils/streak.js";
+import { computeHeadToHead } from "../utils/headToHead.js";
 
 const RANK_COLOR = { 1: "gold", 2: "silver", 3: "bronze" };
 const RANK_BADGE_CLASS = {
@@ -28,9 +29,19 @@ function RankBadge({ rank }) {
   );
 }
 
+function StatCell({ label, value }) {
+  return (
+    <div className="flex w-8 flex-col items-center">
+      <span className="text-sm font-semibold text-neutral-text-default">{value}</span>
+      <span className="text-[10px] font-medium tracking-wide text-neutral-text-subtle uppercase">{label}</span>
+    </div>
+  );
+}
+
 export default function StandingsTable({ participants, onDelete, onSelect, scoringMode = "WIN_COUNT", matches = [] }) {
   const [pendingDelete, setPendingDelete] = useState(null);
-  const historyNoun = scoringMode === "ELO" ? "match" : "round";
+  const isElo = scoringMode === "ELO";
+  const historyNoun = isElo ? "match" : "round";
 
   if (participants.length === 0) {
     return (
@@ -47,14 +58,18 @@ export default function StandingsTable({ participants, onDelete, onSelect, scori
       <ul className="divide-y divide-neutral-border-subtle border border-neutral-border-subtle bg-neutral-surface-default">
         {participants.map((p, index) => {
           const rank = index + 1;
-          const score = scoringMode === "ELO" ? p.rating : p.totalWins;
-          const streak = scoringMode === "ELO" ? computeStreak(p.id, matches) : null;
+          const score = isElo ? p.rating : p.totalWins;
+          const streak = isElo ? computeStreak(p.id, matches) : null;
+          const record = isElo ? computeHeadToHead(p.id, matches) : null;
           return (
             <li key={p.id} className="flex items-center">
               <button
                 type="button"
                 onClick={() => onSelect(p)}
-                className="grid flex-1 grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-surface-tinted sm:px-5 sm:py-3.5"
+                className={cx(
+                  "grid flex-1 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-surface-tinted sm:px-5 sm:py-3.5",
+                  isElo ? "grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto]" : "grid-cols-[auto_1fr_auto]",
+                )}
               >
                 <RankBadge rank={rank} />
                 <div className="flex min-w-0 items-center gap-3">
@@ -62,7 +77,21 @@ export default function StandingsTable({ participants, onDelete, onSelect, scori
                   <span className="truncate text-sm font-medium text-neutral-text-default">{p.name}</span>
                   <StreakBadge streak={streak} size="sm" />
                 </div>
-                <span className="text-sm font-bold text-neutral-text-default">{score}</span>
+                {isElo && (
+                  <div className="flex items-center gap-4 max-sm:hidden">
+                    <StatCell label="P" value={record.played} />
+                    <StatCell label="W" value={record.wins} />
+                    <StatCell label="L" value={record.losses} />
+                  </div>
+                )}
+                <div className="flex w-16 flex-col items-end gap-0.5">
+                  {isElo && (
+                    <span className="text-xs text-neutral-text-subtle sm:hidden">
+                      {record.wins}-{record.losses}
+                    </span>
+                  )}
+                  <span className="text-sm font-bold text-neutral-text-default">{score}</span>
+                </div>
               </button>
               <button
                 type="button"
