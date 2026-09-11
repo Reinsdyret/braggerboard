@@ -1,52 +1,44 @@
 @import "tailwindcss";
+@import "@kilden/designsystem/styles.css";
 
 @theme {
-  /* Sampled directly from Timer (an actual internal Bekk app's compiled CSS), not the
-     marketing site - internal tools use a plain Arial stack, no webfont. */
-  --font-sans: Arial, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+  /* Re-register Kilden's runtime CSS custom properties as Tailwind theme colors so our own
+     build generates every utility we need (hover:, focus-visible:, etc.) - Kilden's own
+     precompiled CSS only ships the exact class combinations its own components happened to use. */
+  --color-neutral-background-default: var(--color-neutral-background-default);
+  --color-neutral-background-tinted: var(--color-neutral-background-tinted);
+  --color-neutral-surface-default: var(--color-neutral-surface-default);
+  --color-neutral-surface-tinted: var(--color-neutral-surface-tinted);
+  --color-neutral-surface-hover: var(--color-neutral-surface-hover);
+  --color-neutral-surface-active: var(--color-neutral-surface-active);
+  --color-neutral-border-subtle: var(--color-neutral-border-subtle);
+  --color-neutral-border-default: var(--color-neutral-border-default);
+  --color-neutral-border-strong: var(--color-neutral-border-strong);
+  --color-neutral-text-subtle: var(--color-neutral-text-subtle);
+  --color-neutral-text-default: var(--color-neutral-text-default);
+  --color-neutral-base-default: var(--color-neutral-base-default);
+  --color-neutral-base-hover: var(--color-neutral-base-hover);
+  --color-neutral-base-contrast-default: var(--color-neutral-base-contrast-default);
 
-  /* Timer's real accent is a blue-violet (#6943ff), not the marketing site's lime - used only
-     for focus outlines, links, and selection tints. Primary actions are solid black (see
-     Button.jsx), matching Timer's ._primaryButton_. */
-  --color-brand-50: #ededff;
-  --color-brand-100: #d6d1ff;
-  --color-brand-200: #b3a8ff;
-  --color-brand-300: #9483ff;
-  --color-brand-400: #7d5fff;
-  --color-brand-500: #6943ff;
-  --color-brand-600: #5433d6;
-  --color-brand-700: #4326ad;
-  --color-brand-800: #331d85;
-  --color-brand-900: #15143c;
-  --color-brand-950: #0d0c26;
+  --color-dominant-background-tinted: var(--color-dominant-background-tinted);
+  --color-dominant-border-default: var(--color-dominant-border-default);
 
-  /* True neutral gray, anchored at Timer's exact values: #1a1a1a ink, #595959 secondary text,
-     #a0a0a0 muted/disabled text, #dedede hairline border, #f4f4f4 disabled fill, white surface. */
-  --color-gray-50: #ffffff;
-  --color-gray-100: #f4f4f4;
-  --color-gray-200: #dedede;
-  --color-gray-300: #c7c7c7;
-  --color-gray-400: #a0a0a0;
-  --color-gray-500: #8a8a8a;
-  --color-gray-600: #595959;
-  --color-gray-700: #404040;
-  --color-gray-800: #2b2b2b;
-  --color-gray-900: #1a1a1a;
-  --color-gray-950: #0d0d0d;
+  --color-accent-background-tinted: var(--color-accent-background-tinted);
+  --color-accent-border-default: var(--color-accent-border-default);
+  --color-accent-text-default: var(--color-accent-text-default);
 
-  --color-gold-500: #eab308;
-  --color-silver-400: #9ca3af;
-  --color-bronze-500: #c2703d;
+  --color-success-background-tinted: var(--color-success-background-tinted);
+  --color-success-surface-hover: var(--color-success-surface-hover);
+  --color-success-text-default: var(--color-success-text-default);
+  --color-success-base-default: var(--color-success-base-default);
 
-  /* Timer's rows/cards are flat - separated by hairline borders, no shadow. Modals are the
-     one place it uses a real (if modest) shadow: 0 8px 32px rgba(0,0,0,.2), sampled exactly. */
-  --radius-lg: 0.25rem;
-  --radius-xl: 0.375rem;
-  --radius-2xl: 0.5rem;
+  --color-warning-background-tinted: var(--color-warning-background-tinted);
+  --color-warning-text-default: var(--color-warning-text-default);
 
-  --shadow-card: none;
-  --shadow-card-hover: none;
-  --shadow-popover: 0 8px 32px rgb(0 0 0 / 0.2);
+  --color-danger-background-tinted: var(--color-danger-background-tinted);
+  --color-danger-surface-hover: var(--color-danger-surface-hover);
+  --color-danger-text-default: var(--color-danger-text-default);
+  --color-danger-base-default: var(--color-danger-base-default);
 
   --animate-fade-in: fade-in 0.15s ease-out;
   --animate-overlay-in: overlay-in 0.2s ease-out;
@@ -94,6 +86,6 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-neutral-background-default text-neutral-text-default antialiased;
   }
 }

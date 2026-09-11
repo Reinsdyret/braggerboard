@@ -17,14 +17,14 @@ export default function ChangeLog({ changes }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs font-semibold tracking-wide text-gray-600 uppercase">
+      <p className="text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">
         Profile history
       </p>
       <ul className="flex flex-col gap-1.5">
         {changes.map((change) => (
           <li
             key={change.id}
-            className="flex items-center justify-between gap-2 text-xs text-gray-600"
+            className="flex items-center justify-between gap-2 text-xs text-neutral-text-subtle"
           >
             <span className="truncate">{describeChange(change)}</span>
             <span className="shrink-0">{formatDate(change.changedAt)}</span>

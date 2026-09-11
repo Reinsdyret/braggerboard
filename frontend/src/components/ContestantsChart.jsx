@@ -66,7 +66,12 @@ function layoutEndLabels(entries) {
   return sorted;
 }
 
-const CHROME = { grid: "#f5f5f5", axis: "#a3a3a3", ring: "#ffffff", crosshair: "#d4d4d4" };
+const CHROME = {
+  grid: "var(--color-neutral-border-subtle)",
+  axis: "var(--color-neutral-text-subtle)",
+  ring: "var(--color-neutral-background-default)",
+  crosshair: "var(--color-neutral-border-default)",
+};
 
 export default function ContestantsChart({ title, valueLabel, timelines, emptyMessage }) {
   const containerRef = useRef(null);
@@ -160,7 +165,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
   return (
     <div>
       {title && (
-        <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-600 uppercase">
+        <h2 className="mb-3 text-sm font-semibold tracking-wide text-neutral-text-subtle uppercase">
           {title}
         </h2>
       )}
@@ -176,8 +181,8 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
               className={cx(
                 "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
                 isHidden
-                  ? "border-gray-200 text-gray-400"
-                  : "border-gray-200 text-gray-700",
+                  ? "border-neutral-border-subtle text-neutral-text-subtle"
+                  : "border-neutral-border-subtle text-neutral-text-default",
               )}
             >
               <span
@@ -255,7 +260,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
               dy="0.32em"
               fontSize="11"
               fontWeight="600"
-              fill="#404040"
+              fill="var(--color-neutral-text-default)"
             >
               {label.name.length > 14 ? `${label.name.slice(0, 13)}…` : label.name}
             </text>
@@ -274,18 +279,18 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
 
         {hoverRows.length > 0 && (
           <div
-            className="pointer-events-none absolute top-2 z-10 w-48 -translate-x-1/2 border border-gray-200 bg-white p-2.5 shadow-[var(--shadow-popover)]"
+            className="pointer-events-none absolute top-2 z-10 w-48 -translate-x-1/2 border border-neutral-border-subtle bg-neutral-surface-default p-2.5 shadow-[0_8px_32px_rgb(0_0_0/0.2)]"
             style={{ left: tooltipLeft }}
           >
-            <p className="mb-1.5 text-[11px] font-medium text-gray-400">
+            <p className="mb-1.5 text-[11px] font-medium text-neutral-text-subtle">
               {formatTooltipDate(hoverTime)}
             </p>
             <ul className="flex flex-col gap-1">
               {hoverRows.map((row) => (
                 <li key={row.id} className="flex items-center gap-1.5 text-xs">
                   <span className="h-0.5 w-3 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
-                  <span className="min-w-0 flex-1 truncate text-gray-600">{row.name}</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="min-w-0 flex-1 truncate text-neutral-text-subtle">{row.name}</span>
+                  <span className="font-semibold text-neutral-text-default">
                     {Math.round(row.value).toLocaleString()}
                   </span>
                 </li>

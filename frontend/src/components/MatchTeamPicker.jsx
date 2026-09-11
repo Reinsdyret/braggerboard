@@ -1,4 +1,4 @@
-import Select from "./ui/Select.jsx";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@kilden/designsystem";
 import { cx } from "../utils/cx.js";
 
 export const OUTCOMES = [
@@ -32,40 +32,54 @@ export default function MatchTeamPicker({
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-1 flex-col gap-2">
-          <p className="text-xs font-semibold tracking-wide text-gray-600 uppercase">Team A</p>
+          <p className="text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Team A</p>
           {teamA.map((value, i) => (
-            <Select key={i} value={value} onChange={(e) => updateSlot(onTeamAChange, teamA, i, e.target.value)}>
-              <option value="">Choose participant…</option>
-              {optionsFor(value).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
+            <Select
+              key={i}
+              value={value || undefined}
+              onValueChange={(next) => updateSlot(onTeamAChange, teamA, i, next)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose participant…" />
+              </SelectTrigger>
+              <SelectContent>
+                {optionsFor(value).map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           ))}
         </div>
 
-        <span className="hidden self-center text-xs font-semibold text-gray-400 sm:block">
-          VS
-        </span>
+        <span className="hidden self-center text-xs font-semibold text-neutral-text-subtle sm:block">VS</span>
 
         <div className="flex flex-1 flex-col gap-2">
-          <p className="text-xs font-semibold tracking-wide text-gray-600 uppercase">Team B</p>
+          <p className="text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Team B</p>
           {teamB.map((value, i) => (
-            <Select key={i} value={value} onChange={(e) => updateSlot(onTeamBChange, teamB, i, e.target.value)}>
-              <option value="">Choose participant…</option>
-              {optionsFor(value).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
+            <Select
+              key={i}
+              value={value || undefined}
+              onValueChange={(next) => updateSlot(onTeamBChange, teamB, i, next)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose participant…" />
+              </SelectTrigger>
+              <SelectContent>
+                {optionsFor(value).map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           ))}
         </div>
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-semibold tracking-wide text-gray-600 uppercase">Winner</p>
+        <p className="mb-2 text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Winner</p>
         <div className="grid grid-cols-3 gap-2">
           {OUTCOMES.map((opt) => (
             <button
@@ -75,8 +89,8 @@ export default function MatchTeamPicker({
               className={cx(
                 "rounded-lg border py-2 text-sm font-semibold transition-colors",
                 outcome === opt.value
-                  ? "border-gray-900 bg-gray-900 text-white"
-                  : "border-gray-200 text-gray-600 hover:border-gray-400",
+                  ? "border-neutral-border-strong bg-neutral-base-default text-neutral-base-contrast-default"
+                  : "border-neutral-border-subtle text-neutral-text-subtle hover:border-neutral-border-default",
               )}
             >
               {opt.label}

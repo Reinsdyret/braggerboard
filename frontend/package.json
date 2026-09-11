@@ -12,6 +12,8 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@kilden/design-tokens": "^0.0.5",
+    "@kilden/designsystem": "^0.0.20",
     "@tailwindcss/vite": "^4.3.3",
     "lucide-react": "^1.44.0",
     "react": "^19.0.0",

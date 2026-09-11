@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trophy, ChevronRight, AlertCircle, TrendingUp } from "lucide-react";
+import { Trophy, ChevronRight, TrendingUp } from "lucide-react";
+import { Button, Card, CardContent, Input } from "@kilden/designsystem";
 import { createLeaderboard } from "./api.js";
 import { loadRecents } from "./recents.js";
-import Button from "./components/ui/Button.jsx";
-import Card from "./components/ui/Card.jsx";
-import Input from "./components/ui/Input.jsx";
 import { cx } from "./utils/cx.js";
 
 const SCORING_MODES = [
@@ -31,23 +29,23 @@ function OptionCard({ selected, onSelect, icon: Icon, label, description }) {
       className={cx(
         "flex flex-1 items-start gap-3 border p-3.5 text-left transition-colors",
         selected
-          ? "border-gray-900"
-          : "border-gray-200 bg-white hover:border-gray-400",
+          ? "border-neutral-border-strong"
+          : "border-neutral-border-subtle bg-neutral-surface-default hover:border-neutral-border-default",
       )}
     >
       <div
         className={cx(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
           selected
-            ? "bg-gray-900 text-white"
-            : "bg-gray-100 text-gray-600",
+            ? "bg-neutral-base-default text-neutral-base-contrast-default"
+            : "bg-neutral-surface-tinted text-neutral-text-subtle",
         )}
       >
         <Icon size={16} />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-gray-800">{label}</p>
-        {description && <p className="mt-0.5 text-xs text-gray-600">{description}</p>}
+        <p className="text-sm font-semibold text-neutral-text-default">{label}</p>
+        {description && <p className="mt-0.5 text-xs text-neutral-text-subtle">{description}</p>}
       </div>
     </button>
   );
@@ -85,80 +83,68 @@ export default function Home() {
     <div className="relative min-h-screen overflow-hidden">
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-16 sm:px-6">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center text-gray-900">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center text-neutral-text-default">
             <Trophy size={28} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-neutral-text-default sm:text-3xl">
             Leaderboard
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-neutral-text-subtle">
             Create a leaderboard, share the link, track who's winning.
           </p>
         </div>
 
         <Card>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label htmlFor="leaderboard-name" className="sr-only">
-                Leaderboard name
-              </label>
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Input
                 id="leaderboard-name"
+                label="Leaderboard name"
                 type="text"
                 placeholder="Leaderboard name, e.g. Friday Darts"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                error={Boolean(error)}
+                error={error ?? undefined}
                 required
                 autoFocus
               />
-            </div>
 
-            <div>
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-600 uppercase">Scoring</p>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                {SCORING_MODES.map((mode) => (
-                  <OptionCard
-                    key={mode.value}
-                    selected={scoringMode === mode.value}
-                    onSelect={() => setScoringMode(mode.value)}
-                    icon={mode.icon}
-                    label={mode.label}
-                    description={mode.description}
-                  />
-                ))}
+              <div>
+                <p className="mb-2 text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Scoring</p>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  {SCORING_MODES.map((mode) => (
+                    <OptionCard
+                      key={mode.value}
+                      selected={scoringMode === mode.value}
+                      onSelect={() => setScoringMode(mode.value)}
+                      icon={mode.icon}
+                      label={mode.label}
+                      description={mode.description}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="admin-password" className="mb-2 block text-xs font-semibold tracking-wide text-gray-600 uppercase">
-                Admin password
-              </label>
               <Input
                 id="admin-password"
+                label="Admin password"
                 type="password"
                 placeholder="Choose a password to delete this leaderboard later"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-            </div>
 
-            <Button type="submit" size="lg" isLoading={submitting} isDisabled={!name.trim() || !password}>
-              Create leaderboard
-            </Button>
-            {error && (
-              <p className="flex items-center gap-1.5 text-sm text-[#9c0f0f]">
-                <AlertCircle size={16} className="shrink-0" />
-                {error}
-              </p>
-            )}
-          </form>
+              <Button type="submit" size="md" isLoading={submitting} disabled={!name.trim() || !password}>
+                Create leaderboard
+              </Button>
+            </form>
+          </CardContent>
         </Card>
 
         {recents.length > 0 && (
           <div className="mt-8">
-            <h2 className="mb-2 px-1 text-xs font-semibold tracking-wide text-gray-600 uppercase">
+            <h2 className="mb-2 px-1 text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">
               Your recent leaderboards
             </h2>
             <div className="flex flex-col gap-2">
@@ -166,17 +152,17 @@ export default function Home() {
                 <a
                   key={r.id}
                   href={`#/l/${r.id}`}
-                  className="group flex items-center gap-3 border border-gray-200 bg-white px-4 py-3 transition-colors hover:border-gray-900 hover:bg-gray-100"
+                  className="group flex items-center gap-3 border border-neutral-border-subtle bg-neutral-surface-default px-4 py-3 transition-colors hover:border-neutral-border-strong hover:bg-neutral-surface-tinted"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-surface-tinted text-neutral-text-subtle">
                     <Trophy size={16} />
                   </div>
-                  <span className="flex-1 truncate text-sm font-medium text-gray-800">
+                  <span className="flex-1 truncate text-sm font-medium text-neutral-text-default">
                     {r.name}
                   </span>
                   <ChevronRight
                     size={16}
-                    className="shrink-0 text-gray-300 group-hover:text-gray-600"
+                    className="shrink-0 text-neutral-text-subtle group-hover:text-neutral-text-default"
                   />
                 </a>
               ))}

@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { FileTrigger, Button as AriaButton } from "react-aria-components";
 import { UserPlus, Camera, X, AlertCircle } from "lucide-react";
+import { Button, Card, CardContent, Input } from "@kilden/designsystem";
 import { addParticipant } from "../api.js";
 import { useToast } from "./ui/ToastProvider.jsx";
-import Button from "./ui/Button.jsx";
-import Card from "./ui/Card.jsx";
-import Input from "./ui/Input.jsx";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -62,58 +60,60 @@ export default function AddParticipantForm({ leaderboardId, onAdded }) {
 
   return (
     <Card>
-      <div className="mb-4 flex items-center gap-2">
-        <UserPlus size={18} className="text-gray-900" />
-        <h3 className="text-sm font-semibold text-gray-700">Add participant</h3>
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <FileTrigger acceptedFileTypes={["image/*"]} onSelect={handleFileSelect}>
-          <AriaButton
-            className="group relative flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gray-300 bg-gray-100 text-gray-400 outline-none transition-colors hover:border-brand-500 hover:bg-brand-50 hover:text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
-            aria-label="Choose a photo"
-          >
-            {previewUrl ? (
-              <img src={previewUrl} alt="Selected preview" className="h-full w-full object-cover" />
-            ) : (
-              <Camera size={20} />
-            )}
-          </AriaButton>
-        </FileTrigger>
-
-        <div className="flex flex-1 flex-col gap-3">
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="flex-1"
-            />
-            {file && (
-              <button
-                type="button"
-                onClick={() => setFile(null)}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-300 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
-                aria-label="Remove selected photo"
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-          <Button type="submit" isLoading={submitting} isDisabled={!name.trim()} className="w-full sm:w-auto sm:self-end">
-            Add
-          </Button>
+      <CardContent className="pt-6">
+        <div className="mb-4 flex items-center gap-2">
+          <UserPlus size={18} className="text-neutral-text-default" />
+          <h3 className="text-sm font-semibold text-neutral-text-default">Add participant</h3>
         </div>
-      </form>
 
-      {error && (
-        <p className="mt-3 flex items-center gap-1.5 text-sm text-[#9c0f0f]">
-          <AlertCircle size={16} className="shrink-0" />
-          {error}
-        </p>
-      )}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <FileTrigger acceptedFileTypes={["image/*"]} onSelect={handleFileSelect}>
+            <AriaButton
+              className="group relative flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-neutral-border-default bg-neutral-surface-tinted text-neutral-text-subtle outline-none transition-colors hover:border-accent-border-default hover:bg-accent-background-tinted hover:text-accent-text-default focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-border-default"
+              aria-label="Choose a photo"
+            >
+              {previewUrl ? (
+                <img src={previewUrl} alt="Selected preview" className="h-full w-full object-cover" />
+              ) : (
+                <Camera size={20} />
+              )}
+            </AriaButton>
+          </FileTrigger>
+
+          <div className="flex flex-1 flex-col gap-3">
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="flex-1"
+              />
+              {file && (
+                <button
+                  type="button"
+                  onClick={() => setFile(null)}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-border-default text-neutral-text-subtle hover:bg-neutral-surface-tinted hover:text-neutral-text-default"
+                  aria-label="Remove selected photo"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+            <Button type="submit" isLoading={submitting} disabled={!name.trim()} className="w-full sm:w-auto sm:self-end">
+              Add
+            </Button>
+          </div>
+        </form>
+
+        {error && (
+          <p className="mt-3 flex items-center gap-1.5 text-sm text-danger-text-default">
+            <AlertCircle size={16} className="shrink-0" />
+            {error}
+          </p>
+        )}
+      </CardContent>
     </Card>
   );
 }

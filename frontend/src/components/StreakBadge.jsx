@@ -12,8 +12,8 @@ export default function StreakBadge({ streak, size = "md" }) {
       className={cx(
         "inline-flex shrink-0 items-center rounded-full font-semibold",
         isWin
-          ? "bg-green-100 text-green-700"
-          : "bg-[#ffebee] text-[#9c0f0f]",
+          ? "bg-success-background-tinted text-success-text-default"
+          : "bg-danger-background-tinted text-danger-text-default",
         sizeClass,
       )}
     >
