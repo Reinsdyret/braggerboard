@@ -14,6 +14,7 @@ export function computeHeadToHead(participantId, matches) {
   let wins = 0;
   let losses = 0;
   let draws = 0;
+  let lastPlayedAt = null;
   const byOpponent = new Map();
 
   for (const match of matches) {
@@ -29,6 +30,7 @@ export function computeHeadToHead(participantId, matches) {
     if (result === "win") wins += 1;
     else if (result === "loss") losses += 1;
     else draws += 1;
+    if (!lastPlayedAt || new Date(match.createdAt) > new Date(lastPlayedAt)) lastPlayedAt = match.createdAt;
 
     for (const opponent of opponents) {
       const entry = byOpponent.get(opponent.participantId) ?? {
@@ -53,5 +55,5 @@ export function computeHeadToHead(participantId, matches) {
     ? opponents.reduce((a, b) => (b.net < a.net ? b : a))
     : null;
 
-  return { played, wins, losses, draws, opponents, best, worst };
+  return { played, wins, losses, draws, opponents, best, worst, lastPlayedAt };
 }
