@@ -6,6 +6,7 @@ import { deleteParticipant, getLeaderboard, getRounds, getMatches, deleteMatch }
 import { saveRecent, removeRecent } from "./recents.js";
 import { useToast } from "./components/ui/ToastProvider.jsx";
 import { computeEloTimelines, computeWinTimelines } from "./utils/contestantHistory.js";
+import { partitionByActivity } from "./utils/matchesPlayed.js";
 import StandingsTable from "./components/StandingsTable.jsx";
 import ContestantsChart from "./components/ContestantsChart.jsx";
 import AddParticipantForm from "./components/AddParticipantForm.jsx";
@@ -110,6 +111,17 @@ export default function LeaderboardPage() {
   }
 
   const isElo = leaderboard.scoringMode === "ELO";
+  // Only Elo standings skew: win counts are cumulative totals, so a one-round player can't leapfrog
+  // a regular, and round results only record winners - "rounds played" there would be a lie.
+  const { ranked, provisional } = isElo
+    ? partitionByActivity(leaderboard.participants, matches)
+    : { ranked: leaderboard.participants, provisional: [] };
+  // Before anyone has qualified there is nothing to plot, so fall back to the whole roster rather
+  // than showing an empty-graph message on a board that clearly has matches.
+  const charted = ranked.length > 0 ? ranked : leaderboard.participants;
+  const colorOrder = [...leaderboard.participants]
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    .map((p) => p.id);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
@@ -155,7 +167,8 @@ export default function LeaderboardPage() {
 
       <div className="mb-6">
         <StandingsTable
-          participants={leaderboard.participants}
+          participants={ranked}
+          provisional={provisional}
           onDelete={handleDeleteParticipant}
           onSelect={setSelectedParticipant}
           scoringMode={leaderboard.scoringMode}
@@ -171,10 +184,9 @@ export default function LeaderboardPage() {
                 title={isElo ? "Rating over time" : "Wins over time"}
                 valueLabel={isElo ? "Rating" : "Wins"}
                 timelines={
-                  isElo
-                    ? computeEloTimelines(leaderboard.participants, matches)
-                    : computeWinTimelines(leaderboard.participants, rounds)
+                  isElo ? computeEloTimelines(charted, matches) : computeWinTimelines(charted, rounds)
                 }
+                colorOrder={colorOrder}
                 emptyMessage={
                   isElo ? "Play a match to start tracking rating history." : "Add a round to start tracking wins."
                 }

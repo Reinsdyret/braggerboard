@@ -117,6 +117,8 @@ function seedEloLeaderboard() {
     { name: "Charlie", skill: 950, joinedDaysAgo: 70 },
     { name: "Dana", skill: 1150, joinedDaysAgo: 68 },
     { name: "Erik", skill: 1000, joinedDaysAgo: 40 },
+    // Joined last week, one lucky win - the case the provisional group exists for.
+    { name: "Vera", skill: 1000, joinedDaysAgo: 3, provisional: true },
   ];
 
   const participants = roster.map((r) => {
@@ -139,7 +141,7 @@ function seedEloLeaderboard() {
   for (let i = 0; i < 50 && t > 0.3; i++) {
     t -= 0.5 + Math.random() * 2.2;
     if (t < 0.2) t = 0.2;
-    const eligible = participants.filter((p) => p.joinedDaysAgo >= t);
+    const eligible = participants.filter((p) => p.joinedDaysAgo >= t && !p.provisional);
     if (eligible.length < 2) continue;
     const [pa, pb] = [...eligible].sort(() => Math.random() - 0.5);
     const matchId = uuid();
@@ -152,6 +154,20 @@ function seedEloLeaderboard() {
       createdAt: daysAgo(t),
     });
   }
+
+  // Vera's single match, hard-coded rather than left to the random generator so the provisional
+  // group is always there to look at in mock mode.
+  const vera = participants.find((p) => p.name === "Vera");
+  const alice = participants.find((p) => p.name === "Alice");
+  const veraMatchId = uuid();
+  db.matches.set(veraMatchId, {
+    id: veraMatchId,
+    leaderboardId,
+    teamA: [{ participantId: vera.id }],
+    teamB: [{ participantId: alice.id }],
+    outcome: "TEAM_A",
+    createdAt: daysAgo(2),
+  });
 
   ensureRecent(leaderboard);
 }
