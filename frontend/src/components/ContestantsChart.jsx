@@ -73,7 +73,7 @@ const CHROME = {
   crosshair: "var(--color-neutral-border-default)",
 };
 
-export default function ContestantsChart({ title, valueLabel, timelines, emptyMessage }) {
+export default function ContestantsChart({ title, valueLabel, timelines, emptyMessage, colorOrder }) {
   const containerRef = useRef(null);
   const width = useContainerWidth(containerRef, 640);
   const [hidden, setHidden] = useState(() => new Set());
@@ -81,12 +81,15 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
 
   // Color is keyed to join order, not the current standings rank - so a contestant keeps
   // their color as ranks shuffle around them instead of colors reshuffling with the table.
+  // colorOrder lets the caller allocate colors over the full roster, so colors also hold steady
+  // when a contestant is added to or dropped from the plotted set.
   const active = timelines.filter((t) => t.points.length > 0);
-  const colorById = new Map(
+  const order =
+    colorOrder ??
     [...active]
       .sort((a, b) => new Date(a.participant.createdAt) - new Date(b.participant.createdAt))
-      .map((t, i) => [t.participant.id, colorForIndex(i)]),
-  );
+      .map((t) => t.participant.id);
+  const colorById = new Map(order.map((id, i) => [id, colorForIndex(i)]));
   const series = active.map((t) => ({ ...t, color: colorById.get(t.participant.id) }));
 
   function toggle(id) {
