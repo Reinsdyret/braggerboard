@@ -16,12 +16,20 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
   const [outcome, setOutcome] = useState("TEAM_A");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  // Bumped whenever the picks are cleared: the selects hold their own state while a slot is
+  // empty, so they have to be remounted or they keep showing the participants we just cleared.
+  const [pickerKey, setPickerKey] = useState(0);
   const addToast = useToast();
+
+  function clearPicks(size) {
+    setTeamA(Array(size).fill(""));
+    setTeamB(Array(size).fill(""));
+    setPickerKey((key) => key + 1);
+  }
 
   function handleTeamSizeChange(size) {
     setTeamSize(size);
-    setTeamA(Array(size).fill(""));
-    setTeamB(Array(size).fill(""));
+    clearPicks(size);
   }
 
   const chosenIds = [...teamA, ...teamB].filter(Boolean);
@@ -43,8 +51,7 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
     try {
       await addMatch(leaderboardId, teamA, teamB, outcome);
       addToast("Match recorded");
-      setTeamA(Array(teamSize).fill(""));
-      setTeamB(Array(teamSize).fill(""));
+      clearPicks(teamSize);
       setOutcome("TEAM_A");
       onAdded();
     } catch (err) {
@@ -106,6 +113,7 @@ export default function AddMatchForm({ leaderboardId, participants, onAdded }) {
             </p>
           ) : (
             <MatchTeamPicker
+              key={pickerKey}
               participants={participants}
               teamA={teamA}
               teamB={teamB}
