@@ -49,10 +49,11 @@ function RecordGroup({ title, icon, iconClass, records }) {
 }
 
 /**
- * A group of records is only framed as "best vs worst" when there's an actual gap between the top
- * and bottom net score - otherwise that framing is a contradiction, since it labels the exact same
- * record as both the best and the worst one. When there IS a gap, everyone tied at the top (or
- * bottom) is shown: picking one arbitrarily would hide an equally good (or bad) record.
+ * A group of records is only framed as "best" when there's an actual gap between the top and bottom
+ * net score - otherwise that framing is a contradiction, since it labels the exact same record as
+ * both the best and the worst one, so the whole list is shown flat instead. When there IS a gap,
+ * everyone tied at the top (or bottom) is shown: picking one arbitrarily would hide an equally good
+ * (or bad) record. The bottom end is only rendered when the caller asks for it by name.
  */
 function RecordSection({ records, bestTitle, worstTitle, flatTitle }) {
   if (records.length === 0) return null;
@@ -71,14 +72,20 @@ function RecordSection({ records, bestTitle, worstTitle, flatTitle }) {
     );
   }
 
+  const best = (
+    <RecordGroup
+      title={bestTitle}
+      icon={TrendingUp}
+      iconClass="bg-success-background-tinted text-success-text-default"
+      records={records.filter((r) => r.net === topNet)}
+    />
+  );
+
+  if (!worstTitle) return best;
+
   return (
     <div className="flex flex-col gap-4">
-      <RecordGroup
-        title={bestTitle}
-        icon={TrendingUp}
-        iconClass="bg-success-background-tinted text-success-text-default"
-        records={records.filter((r) => r.net === topNet)}
-      />
+      {best}
       <RecordGroup
         title={worstTitle}
         icon={TrendingDown}
@@ -170,12 +177,7 @@ export default function PlayerCard({ participant, scoringMode, matches, isOpen, 
                 worstTitle="Toughest opponent"
                 flatTitle="Head to head"
               />
-              <RecordSection
-                records={teammates}
-                bestTitle="Best with"
-                worstTitle="Worst with"
-                flatTitle="Teammates"
-              />
+              <RecordSection records={teammates} bestTitle="Best with" flatTitle="Teammates" />
             </div>
           </>
         )}
