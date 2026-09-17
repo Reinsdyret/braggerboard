@@ -4,10 +4,31 @@ export function outcomeFor(myTeam, outcome) {
   return won ? "win" : "loss";
 }
 
+function tallyInto(records, people, result) {
+  for (const person of people) {
+    const entry = records.get(person.participantId) ?? {
+      id: person.participantId,
+      name: person.participantName,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+    };
+    if (result === "win") entry.wins += 1;
+    else if (result === "loss") entry.losses += 1;
+    else entry.draws += 1;
+    records.set(person.participantId, entry);
+  }
+}
+
+/** Net wins is what "best" and "worst" are ranked by, so a 5-1 record outranks a 1-0 one. */
+function withNet(records) {
+  return [...records.values()].map((r) => ({ ...r, net: r.wins - r.losses }));
+}
+
 /**
- * Computes a participant's overall record and per-opponent head-to-head record from
- * match history. "Best against" / "toughest opponent" are ranked by net wins
- * (wins - losses) rather than win percentage, so a 5-1 record outranks a 1-0 record.
+ * Computes a participant's overall record plus their record alongside each teammate and
+ * against each opponent. Teammates are only ever populated on team matches - on a leaderboard
+ * played entirely 1v1 the list stays empty, and callers are expected to hide the section.
  */
 export function computeHeadToHead(participantId, matches) {
   let played = 0;
@@ -15,7 +36,8 @@ export function computeHeadToHead(participantId, matches) {
   let losses = 0;
   let draws = 0;
   let lastPlayedAt = null;
-  const byOpponent = new Map();
+  const opponentRecords = new Map();
+  const teammateRecords = new Map();
 
   for (const match of matches) {
     const inTeamA = match.teamA.some((p) => p.participantId === participantId);
@@ -24,6 +46,7 @@ export function computeHeadToHead(participantId, matches) {
 
     const myTeam = inTeamA ? "A" : "B";
     const opponents = inTeamA ? match.teamB : match.teamA;
+    const teammates = (inTeamA ? match.teamA : match.teamB).filter((p) => p.participantId !== participantId);
     const result = outcomeFor(myTeam, match.outcome);
 
     played += 1;
@@ -32,28 +55,17 @@ export function computeHeadToHead(participantId, matches) {
     else draws += 1;
     if (!lastPlayedAt || new Date(match.createdAt) > new Date(lastPlayedAt)) lastPlayedAt = match.createdAt;
 
-    for (const opponent of opponents) {
-      const entry = byOpponent.get(opponent.participantId) ?? {
-        id: opponent.participantId,
-        name: opponent.participantName,
-        wins: 0,
-        losses: 0,
-        draws: 0,
-      };
-      if (result === "win") entry.wins += 1;
-      else if (result === "loss") entry.losses += 1;
-      else entry.draws += 1;
-      byOpponent.set(opponent.participantId, entry);
-    }
+    tallyInto(opponentRecords, opponents, result);
+    tallyInto(teammateRecords, teammates, result);
   }
 
-  const opponents = [...byOpponent.values()].map((o) => ({ ...o, net: o.wins - o.losses }));
-  const best = opponents.length
-    ? opponents.reduce((a, b) => (b.net > a.net ? b : a))
-    : null;
-  const worst = opponents.length
-    ? opponents.reduce((a, b) => (b.net < a.net ? b : a))
-    : null;
-
-  return { played, wins, losses, draws, opponents, best, worst, lastPlayedAt };
+  return {
+    played,
+    wins,
+    losses,
+    draws,
+    opponents: withNet(opponentRecords),
+    teammates: withNet(teammateRecords),
+    lastPlayedAt,
+  };
 }
