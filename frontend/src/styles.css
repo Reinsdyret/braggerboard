@@ -89,3 +89,13 @@
     @apply bg-neutral-background-default text-neutral-text-default antialiased;
   }
 }
+
+/* Lets the chart tooltip sit directly on top of the plotted lines: a halo in the surface
+   colour is painted behind the glyphs only, so text stays readable while the lines keep
+   running through the gaps instead of being hidden by an opaque panel. */
+@utility chart-tooltip-text {
+  text-shadow:
+    0 0 2px var(--color-neutral-surface-default),
+    0 0 5px var(--color-neutral-surface-default),
+    0 0 10px var(--color-neutral-surface-default);
+}
