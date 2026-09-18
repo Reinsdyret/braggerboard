@@ -249,7 +249,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
                   />
                 )}
                 {coords.map(([x, y], i) => (
-                  <circle key={i} cx={x} cy={y} r="4" fill={t.color} stroke={CHROME.ring} strokeWidth="2" />
+                  <circle key={i} cx={x} cy={y} r="2.5" fill={t.color} stroke={CHROME.ring} strokeWidth="1.0" />
                 ))}
               </g>
             );
@@ -282,7 +282,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
 
         {hoverRows.length > 0 && (
           <div
-            className="pointer-events-none absolute top-2 z-10 w-48 -translate-x-1/2 border border-neutral-border-subtle bg-neutral-surface-default p-2.5 shadow-[0_8px_32px_rgb(0_0_0/0.2)]"
+            className="chart-tooltip-text pointer-events-none absolute top-2 z-10 w-48 -translate-x-1/2 rounded-lg border border-neutral-border-subtle/30 bg-neutral-surface-default/20 p-2.5"
             style={{ left: tooltipLeft }}
           >
             <p className="mb-1.5 text-[11px] font-medium text-neutral-text-subtle">
@@ -291,7 +291,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
             <ul className="flex flex-col gap-1">
               {hoverRows.map((row) => (
                 <li key={row.id} className="flex items-center gap-1.5 text-xs">
-                  <span className="h-0.5 w-3 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
+                  <span className="h-1 w-3 shrink-0 rounded-full ring-2 ring-neutral-surface-default/60" style={{ backgroundColor: row.color }} />
                   <span className="min-w-0 flex-1 truncate text-neutral-text-subtle">{row.name}</span>
                   <span className="font-semibold text-neutral-text-default">
                     {Math.round(row.value).toLocaleString()}
