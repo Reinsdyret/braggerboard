@@ -5,11 +5,13 @@ import Avatar from "./Avatar.jsx";
 import ConfirmDialog from "./ui/ConfirmDialog.jsx";
 import EmptyState from "./ui/EmptyState.jsx";
 import StreakBadge from "./StreakBadge.jsx";
+import RankMovement from "./RankMovement.jsx";
 import { cx } from "../utils/cx.js";
 import { MIN_MATCHES_TO_RANK } from "../constants.js";
 import { computeStreak } from "../utils/streak.js";
 import { computeHeadToHead } from "../utils/headToHead.js";
 import { formatRelativeTime } from "../utils/relativeTime.js";
+import { computeRankMovement } from "../utils/rankMovement.js";
 
 const RANK_COLOR = { 1: "gold", 2: "silver", 3: "bronze" };
 const RANK_BADGE_CLASS = {
@@ -47,7 +49,7 @@ function HeaderCell({ label, title }) {
   );
 }
 
-function ColumnHeaders({ isElo }) {
+function ColumnHeaders({ isElo, showMovement }) {
   return (
     <li className="flex items-center max-sm:hidden" aria-hidden="true">
       <div
@@ -56,7 +58,16 @@ function ColumnHeaders({ isElo }) {
           isElo ? "grid-cols-[auto_1fr_auto_auto]" : "grid-cols-[auto_1fr_auto]",
         )}
       >
-        <span className="w-6" />
+        {showMovement ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="w-14 cursor-default">Wk</span>
+            </TooltipTrigger>
+            <TooltipContent side="top">Rank change since start of week</TooltipContent>
+          </Tooltip>
+        ) : (
+          <span className="w-6" />
+        )}
         <span>Player</span>
         {isElo && (
           <div className="flex items-center gap-2">
@@ -75,7 +86,7 @@ function ColumnHeaders({ isElo }) {
 
 // Shared by the ranked list and the provisional group - the identical grid classes are what keep
 // the two groups' columns lined up. A null rank renders a dash and drops the medal styling.
-function StandingRow({ participant: p, rank, isElo, matches, onSelect, onDelete }) {
+function StandingRow({ participant: p, rank, isElo, matches, movement, showMovement, onSelect, onDelete }) {
   const score = isElo ? p.rating : p.totalWins;
   const streak = isElo ? computeStreak(p.id, matches) : null;
   const record = isElo ? computeHeadToHead(p.id, matches) : null;
@@ -90,7 +101,10 @@ function StandingRow({ participant: p, rank, isElo, matches, onSelect, onDelete 
           isElo ? "grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto]" : "grid-cols-[auto_1fr_auto]",
         )}
       >
-        <RankBadge rank={rank} />
+        <div className={cx("flex shrink-0 items-center gap-1", showMovement ? "w-14" : "w-6")}>
+          {showMovement && <RankMovement movement={movement} />}
+          <RankBadge rank={rank} />
+        </div>
         <div className="flex min-w-0 items-center gap-3">
           <Avatar participant={p} rankColor={RANK_COLOR[rank]} />
           <div className="flex min-w-0 flex-col">
@@ -141,10 +155,16 @@ export default function StandingsTable({
   onSelect,
   scoringMode = "WIN_COUNT",
   matches = [],
+  rounds = [],
 }) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const isElo = scoringMode === "ELO";
   const historyNoun = isElo ? "match" : "round";
+
+  // Empty on a board with no history older than the window - there is no movement to show yet,
+  // and the column collapses rather than labelling every row "new".
+  const movement = computeRankMovement({ participants, matches, rounds, scoringMode });
+  const showMovement = movement.size > 0;
 
   if (participants.length === 0 && provisional.length === 0) {
     return (
@@ -156,14 +176,20 @@ export default function StandingsTable({
     );
   }
 
-  const rowProps = { isElo, matches, onSelect, onDelete: setPendingDelete };
+  const rowProps = { isElo, matches, showMovement, onSelect, onDelete: setPendingDelete };
 
   return (
     <>
       <ul className="divide-y divide-neutral-border-subtle border border-neutral-border-subtle bg-neutral-surface-default">
-        <ColumnHeaders isElo={isElo} />
+        <ColumnHeaders isElo={isElo} showMovement={showMovement} />
         {participants.map((p, index) => (
-          <StandingRow key={p.id} participant={p} rank={index + 1} {...rowProps} />
+          <StandingRow
+            key={p.id}
+            participant={p}
+            rank={index + 1}
+            movement={movement.get(p.id)}
+            {...rowProps}
+          />
         ))}
         {provisional.length > 0 && (
           <li className="bg-neutral-surface-tinted px-4 py-2 text-[11px] font-semibold tracking-wide text-neutral-text-subtle uppercase sm:px-5">
