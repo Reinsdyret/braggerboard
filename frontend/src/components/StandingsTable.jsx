@@ -49,26 +49,41 @@ function HeaderCell({ label, title }) {
   );
 }
 
+// Full class strings (not built by concatenation) so Tailwind picks them up. The movement column
+// is an extra fixed-width track right after the player column, so it lines up down every row.
+function headerGridCols(isElo, showMovement) {
+  if (isElo) return showMovement ? "grid-cols-[auto_1fr_auto_auto_auto]" : "grid-cols-[auto_1fr_auto_auto]";
+  return showMovement ? "grid-cols-[auto_1fr_auto_auto]" : "grid-cols-[auto_1fr_auto]";
+}
+
+function rowGridCols(isElo, showMovement) {
+  if (isElo) {
+    return showMovement
+      ? "grid-cols-[auto_1fr_auto_auto] sm:grid-cols-[auto_1fr_auto_auto_auto]"
+      : "grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto]";
+  }
+  return showMovement ? "grid-cols-[auto_1fr_auto_auto]" : "grid-cols-[auto_1fr_auto]";
+}
+
 function ColumnHeaders({ isElo, showMovement }) {
   return (
     <li className="flex items-center max-sm:hidden" aria-hidden="true">
       <div
         className={cx(
           "grid flex-1 items-center gap-3 px-4 py-2 text-[11px] font-semibold tracking-wide text-neutral-text-subtle uppercase sm:px-5",
-          isElo ? "grid-cols-[auto_1fr_auto_auto]" : "grid-cols-[auto_1fr_auto]",
+          headerGridCols(isElo, showMovement),
         )}
       >
-        {showMovement ? (
+        <span className="w-6" />
+        <span>Player</span>
+        {showMovement && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="w-14 cursor-default">Wk</span>
+              <span className="w-7 cursor-default text-center">Wk</span>
             </TooltipTrigger>
             <TooltipContent side="top">Rank change since start of week</TooltipContent>
           </Tooltip>
-        ) : (
-          <span className="w-6" />
         )}
-        <span>Player</span>
         {isElo && (
           <div className="flex items-center gap-2">
             <HeaderCell label="P" title="Played" />
@@ -98,13 +113,10 @@ function StandingRow({ participant: p, rank, isElo, matches, movement, showMovem
         onClick={() => onSelect(p)}
         className={cx(
           "grid flex-1 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-surface-tinted sm:px-5 sm:py-3.5",
-          isElo ? "grid-cols-[auto_1fr_auto] sm:grid-cols-[auto_1fr_auto_auto]" : "grid-cols-[auto_1fr_auto]",
+          rowGridCols(isElo, showMovement),
         )}
       >
-        <div className={cx("flex shrink-0 items-center gap-1", showMovement ? "w-14" : "w-6")}>
-          {showMovement && <RankMovement movement={movement} />}
-          <RankBadge rank={rank} />
-        </div>
+        <RankBadge rank={rank} />
         <div className="flex min-w-0 items-center gap-3">
           <Avatar participant={p} rankColor={RANK_COLOR[rank]} />
           <div className="flex min-w-0 flex-col">
@@ -119,6 +131,7 @@ function StandingRow({ participant: p, rank, isElo, matches, movement, showMovem
             )}
           </div>
         </div>
+        {showMovement && <RankMovement movement={movement} />}
         {isElo && (
           <div className="flex items-center gap-2 max-sm:hidden">
             <StatCell value={record.played} />
