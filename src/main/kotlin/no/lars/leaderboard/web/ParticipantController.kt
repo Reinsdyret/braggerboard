@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -25,6 +26,8 @@ import java.util.NoSuchElementException
 import java.util.UUID
 
 private const val MAX_NAME_LENGTH = 100
+
+data class DeleteParticipantRequest(val password: String)
 
 @RestController
 class ParticipantController(
@@ -115,9 +118,11 @@ class ParticipantController(
 
     @DeleteMapping("/api/participants/{participantId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun delete(@PathVariable participantId: UUID) {
-        val deleted = participantRepository.delete(participantId)
-        if (!deleted) throw NoSuchElementException("Participant $participantId not found")
+    fun delete(@PathVariable participantId: UUID, @RequestBody request: DeleteParticipantRequest) {
+        val participant = participantRepository.findById(participantId)
+            ?: throw NoSuchElementException("Participant $participantId not found")
+        leaderboardService.requireAdminPassword(participant.leaderboardId, request.password)
+        participantRepository.delete(participantId)
     }
 
     private fun requireUniqueName(leaderboardId: UUID, name: String, excludeId: UUID? = null) {

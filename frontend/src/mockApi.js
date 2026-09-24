@@ -393,9 +393,13 @@ export async function addParticipant(leaderboardId, name, imageFile) {
   return toParticipantDto(participant);
 }
 
-export async function deleteParticipant(participantId) {
+export async function deleteParticipant(participantId, password) {
   await delay();
-  if (!db.participants.has(participantId)) throw new Error(`Participant ${participantId} not found`);
+  const participant = db.participants.get(participantId);
+  if (!participant) throw new Error(`Participant ${participantId} not found`);
+  if (password !== db.leaderboards.get(participant.leaderboardId)?.adminPassword) {
+    throw new Error("Incorrect admin password");
+  }
   db.participants.delete(participantId);
   db.changes.delete(participantId);
   for (const m of db.matches.values()) {
