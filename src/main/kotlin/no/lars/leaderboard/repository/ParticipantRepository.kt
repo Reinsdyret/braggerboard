@@ -61,6 +61,15 @@ class ParticipantRepository(private val jdbcTemplate: JdbcTemplate) {
             id,
         ).firstOrNull()
 
+    fun nameExists(leaderboardId: UUID, name: String, excludeId: UUID? = null): Boolean =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM participant WHERE leaderboard_id = ? AND LOWER(name) = LOWER(?) AND id <> ?",
+            Int::class.java,
+            leaderboardId,
+            name,
+            excludeId ?: UUID(0, 0),
+        )!! > 0
+
     fun findImage(id: UUID): ParticipantImage? =
         jdbcTemplate.query(
             "SELECT image_data, image_content_type FROM participant WHERE id = ? AND image_data IS NOT NULL",

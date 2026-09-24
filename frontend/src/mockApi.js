@@ -362,12 +362,22 @@ export async function deleteLeaderboard(id, password) {
   return null;
 }
 
+function requireUniqueName(leaderboardId, name, excludeId = null) {
+  const lower = name.toLowerCase();
+  for (const p of db.participants.values()) {
+    if (p.leaderboardId === leaderboardId && p.id !== excludeId && p.name.toLowerCase() === lower) {
+      throw new Error(`A participant named "${name}" already exists on this leaderboard`);
+    }
+  }
+}
+
 export async function addParticipant(leaderboardId, name, imageFile) {
   await delay();
   if (!db.leaderboards.has(leaderboardId)) throw new Error(`Leaderboard ${leaderboardId} not found`);
   const trimmed = (name ?? "").trim();
   if (!trimmed) throw new Error("Participant name must not be blank");
   if (trimmed.length > MAX_NAME_LENGTH) throw new Error(`Participant name must be ${MAX_NAME_LENGTH} characters or fewer`);
+  requireUniqueName(leaderboardId, trimmed);
 
   const imageDataUrl = imageFile ? await fileToDataUrl(imageFile) : null;
   const id = uuid();
@@ -408,6 +418,7 @@ export async function updateParticipant(participantId, { name, imageFile, remove
     if (!trimmed) throw new Error("Participant name must not be blank");
     if (trimmed.length > MAX_NAME_LENGTH) throw new Error(`Participant name must be ${MAX_NAME_LENGTH} characters or fewer`);
     if (trimmed !== participant.name) {
+      requireUniqueName(participant.leaderboardId, trimmed, participantId);
       logChange(participantId, "NAME", participant.name, trimmed);
       participant.name = trimmed;
     }

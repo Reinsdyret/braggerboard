@@ -45,6 +45,7 @@ class ParticipantController(
         require(name.isNotBlank()) { "Participant name must not be blank" }
         require(name.length <= MAX_NAME_LENGTH) { "Participant name must be $MAX_NAME_LENGTH characters or fewer" }
         leaderboardService.requireExists(leaderboardId)
+        requireUniqueName(leaderboardId, name.trim())
 
         val participantImage = image?.takeIf { !it.isEmpty }?.let { validatedImage(it) }
 
@@ -69,6 +70,7 @@ class ParticipantController(
             require(trimmed.isNotBlank()) { "Participant name must not be blank" }
             require(trimmed.length <= MAX_NAME_LENGTH) { "Participant name must be $MAX_NAME_LENGTH characters or fewer" }
             if (trimmed != existing.name) {
+                requireUniqueName(existing.leaderboardId, trimmed, excludeId = participantId)
                 participantRepository.logChange(participantId, ChangeField.NAME, existing.name, trimmed)
                 participantRepository.updateName(participantId, trimmed)
             }
@@ -116,6 +118,12 @@ class ParticipantController(
     fun delete(@PathVariable participantId: UUID) {
         val deleted = participantRepository.delete(participantId)
         if (!deleted) throw NoSuchElementException("Participant $participantId not found")
+    }
+
+    private fun requireUniqueName(leaderboardId: UUID, name: String, excludeId: UUID? = null) {
+        require(!participantRepository.nameExists(leaderboardId, name, excludeId)) {
+            "A participant named \"$name\" already exists on this leaderboard"
+        }
     }
 
     private fun validatedImage(file: MultipartFile): ParticipantImage {

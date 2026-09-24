@@ -97,4 +97,33 @@ class ParticipantControllerUpdateTest {
             participantController.update(eve.id, name = "x".repeat(101), image = null, removeImage = false)
         }.isInstanceOf(IllegalArgumentException::class.java)
     }
+
+    @Test
+    fun `rejects creating a participant with a name already taken on the same leaderboard`() {
+        val board = leaderboardRepository.create("Board 6", ScoringMode.WIN_COUNT, "test-hash")
+        participantController.create(board.id, name = "Frank", image = null)
+
+        assertThatThrownBy {
+            participantController.create(board.id, name = "  frank ", image = null)
+        }.isInstanceOf(IllegalArgumentException::class.java)
+
+        val otherBoard = leaderboardRepository.create("Board 7", ScoringMode.WIN_COUNT, "test-hash")
+        assertThat(participantController.create(otherBoard.id, name = "Frank", image = null).name).isEqualTo("Frank")
+    }
+
+    @Test
+    fun `rejects renaming a participant to another participant's name`() {
+        val board = leaderboardRepository.create("Board 8", ScoringMode.WIN_COUNT, "test-hash")
+        participantRepository.create(board.id, "Gina", null)
+        val hank = participantRepository.create(board.id, "Hank", null)
+
+        assertThatThrownBy {
+            participantController.update(hank.id, name = "GINA", image = null, removeImage = false)
+        }.isInstanceOf(IllegalArgumentException::class.java)
+        assertThat(participantController.changes(hank.id).body).isEmpty()
+
+        // Changing only the casing of your own name is still allowed
+        assertThat(participantController.update(hank.id, name = "hank", image = null, removeImage = false).name)
+            .isEqualTo("hank")
+    }
 }
