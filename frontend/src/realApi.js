@@ -46,8 +46,12 @@ export function addParticipant(leaderboardId, name, imageFile) {
   }).then(handle);
 }
 
-export function deleteParticipant(participantId) {
-  return fetch(`${API_BASE}/participants/${participantId}`, { method: "DELETE" }).then(handle);
+export function deleteParticipant(participantId, password) {
+  return fetch(`${API_BASE}/participants/${participantId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  }).then(handle);
 }
 
 export function updateParticipant(participantId, { name, imageFile, removeImage } = {}) {

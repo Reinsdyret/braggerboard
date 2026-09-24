@@ -53,14 +53,11 @@ export default function LeaderboardPage() {
     refresh();
   }, [refresh]);
 
-  async function handleDeleteParticipant(participant) {
-    try {
-      await deleteParticipant(participant.id);
-      addToast(`${participant.name} removed`, { type: "error", duration: 2500 });
-      await refresh();
-    } catch (err) {
-      addToast(err.message, { type: "error" });
-    }
+  // Errors (e.g. a wrong admin password) propagate so the dialog can show them inline.
+  async function handleDeleteParticipant(participant, password) {
+    await deleteParticipant(participant.id, password);
+    addToast(`${participant.name} removed`, { type: "error", duration: 2500 });
+    await refresh();
   }
 
   async function handleDeleteMatch(match) {

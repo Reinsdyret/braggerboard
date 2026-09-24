@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Trash2, Users } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@kilden/designsystem";
 import Avatar from "./Avatar.jsx";
-import ConfirmDialog from "./ui/ConfirmDialog.jsx";
+import DeleteParticipantDialog from "./DeleteParticipantDialog.jsx";
 import EmptyState from "./ui/EmptyState.jsx";
 import StreakBadge from "./StreakBadge.jsx";
 import RankMovement from "./RankMovement.jsx";
@@ -214,14 +214,11 @@ export default function StandingsTable({
         ))}
       </ul>
 
-      <ConfirmDialog
-        isOpen={Boolean(pendingDelete)}
+      <DeleteParticipantDialog
+        participant={pendingDelete}
+        historyNoun={historyNoun}
         onOpenChange={(open) => !open && setPendingDelete(null)}
-        title={`Remove ${pendingDelete?.name}?`}
-        description={`This also deletes their ${historyNoun} history. This can't be undone.`}
-        confirmLabel="Remove"
-        danger
-        onConfirm={() => onDelete(pendingDelete)}
+        onConfirm={(password) => onDelete(pendingDelete, password)}
       />
     </>
   );

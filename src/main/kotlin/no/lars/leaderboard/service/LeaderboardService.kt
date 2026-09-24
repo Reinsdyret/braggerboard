@@ -31,10 +31,14 @@ class LeaderboardService(
     }
 
     fun delete(leaderboardId: UUID, password: String) {
+        requireAdminPassword(leaderboardId, password)
+        leaderboardRepository.deleteById(leaderboardId)
+    }
+
+    fun requireAdminPassword(leaderboardId: UUID, password: String) {
         val adminPasswordHash = leaderboardRepository.findAdminPasswordHash(leaderboardId)
             ?: throw NoSuchElementException("Leaderboard $leaderboardId not found")
         check(passwordEncoder.matches(password, adminPasswordHash)) { "Incorrect admin password" }
-        leaderboardRepository.deleteById(leaderboardId)
     }
 
     fun getDetails(leaderboardId: UUID): LeaderboardDetails {
