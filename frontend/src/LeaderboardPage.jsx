@@ -173,6 +173,7 @@ export default function LeaderboardPage() {
           onSelect={setSelectedParticipant}
           scoringMode={leaderboard.scoringMode}
           matches={matches}
+          rounds={rounds}
         />
       </div>
 

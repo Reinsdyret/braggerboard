@@ -30,6 +30,7 @@
   --color-success-background-tinted: var(--color-success-background-tinted);
   --color-success-surface-hover: var(--color-success-surface-hover);
   --color-success-text-default: var(--color-success-text-default);
+  --color-success-text-subtle: var(--color-success-text-subtle);
   --color-success-base-default: var(--color-success-base-default);
 
   --color-warning-background-tinted: var(--color-warning-background-tinted);
@@ -38,6 +39,7 @@
   --color-danger-background-tinted: var(--color-danger-background-tinted);
   --color-danger-surface-hover: var(--color-danger-surface-hover);
   --color-danger-text-default: var(--color-danger-text-default);
+  --color-danger-text-subtle: var(--color-danger-text-subtle);
   --color-danger-base-default: var(--color-danger-base-default);
 
   --animate-fade-in: fade-in 0.15s ease-out;
