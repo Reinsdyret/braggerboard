@@ -30,6 +30,14 @@ function daysAgo(days) {
   return new Date(Date.now() - days * DAY_MS).toISOString();
 }
 
+// Anchored to a wall-clock hour rather than to "now minus N days", so a burst of matches stays
+// inside one local calendar day no matter what time of day the mock data is seeded.
+function eveningOf(daysAgoCount, secondsIn) {
+  const day = new Date(Date.now() - daysAgoCount * DAY_MS);
+  day.setHours(18, 0, secondsIn, 0);
+  return day.toISOString();
+}
+
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -172,6 +180,9 @@ function seedEloLeaderboard() {
   ensureRecent(leaderboard);
 }
 
+// Fixed so the burst always lands on one identifiable day of the doubles chart.
+const BURST_DAYS_AGO = 7;
+
 function seedElo2v2Leaderboard() {
   const leaderboardId = "demo-elo-2v2";
   const leaderboard = {
@@ -231,6 +242,28 @@ function seedElo2v2Leaderboard() {
       teamB: teamBPlayers.map((p) => ({ participantId: p.id })),
       outcome: pickOutcome(skillA, skillB),
       createdAt: daysAgo(t),
+    });
+  }
+
+  // A whole session banged into the app inside half a minute, the way people actually register
+  // matches - hard-coded rather than left to the random generator so the chart's same-day
+  // spreading always has something to pull apart. Rosa plays all three, so one line has to show
+  // three distinct points on a single day.
+  const by = (name) => participants.find((p) => p.name === name);
+  const burst = [
+    { teamA: ["Nora", "Omar"], teamB: ["Priya", "Rosa"], outcome: "TEAM_A", secondsIn: 0 },
+    { teamA: ["Rosa", "Sam"], teamB: ["Tara", "Uma"], outcome: "TEAM_B", secondsIn: 5 },
+    { teamA: ["Nora", "Rosa"], teamB: ["Omar", "Uma"], outcome: "DRAW", secondsIn: 26 },
+  ];
+  for (const round of burst) {
+    const matchId = uuid();
+    db.matches.set(matchId, {
+      id: matchId,
+      leaderboardId,
+      teamA: round.teamA.map((name) => ({ participantId: by(name).id })),
+      teamB: round.teamB.map((name) => ({ participantId: by(name).id })),
+      outcome: round.outcome,
+      createdAt: eveningOf(BURST_DAYS_AGO, round.secondsIn),
     });
   }
 
