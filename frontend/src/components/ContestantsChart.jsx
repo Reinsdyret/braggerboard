@@ -43,6 +43,30 @@ function timeTicks(minTime, maxTime, count) {
   return Array.from({ length: count }, (_, i) => minTime + step * i);
 }
 
+// Matches registered seconds apart would otherwise stack on the time axis as one blob. Spreading
+// a day's distinct timestamps evenly across that day pulls them apart visually while keeping every
+// point inside the day it actually happened on, so the axis stays honest. Keyed by raw timestamp
+// so all series agree on where a given match sits.
+function spreadWithinDays(times) {
+  const byDay = new Map();
+  for (const time of times) {
+    const dayStart = new Date(time);
+    dayStart.setHours(0, 0, 0, 0);
+    const key = dayStart.getTime();
+    if (!byDay.has(key)) byDay.set(key, { start: key, end: new Date(dayStart).setDate(dayStart.getDate() + 1), times: [] });
+    byDay.get(key).times.push(time);
+  }
+
+  const spread = new Map();
+  for (const { start, end, times: dayTimes } of byDay.values()) {
+    const distinct = [...new Set(dayTimes)].sort((a, b) => a - b);
+    distinct.forEach((time, i) => {
+      spread.set(time, start + ((i + 1) / (distinct.length + 1)) * (end - start));
+    });
+  }
+  return spread;
+}
+
 function formatAxisDate(time, spanMultiYear) {
   return new Date(time).toLocaleDateString(undefined, {
     month: "short",
@@ -105,7 +129,9 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
     return <EmptyState icon={TrendingUp} title="Nothing to chart yet" description={emptyMessage} />;
   }
 
-  const allPoints = series.flatMap((t) => t.points.map((p) => ({ ...p, time: new Date(p.date).getTime() })));
+  const spreadTime = spreadWithinDays(series.flatMap((t) => t.points.map((p) => new Date(p.date).getTime())));
+  const timeOf = (point) => spreadTime.get(new Date(point.date).getTime());
+  const allPoints = series.flatMap((t) => t.points.map((p) => ({ ...p, time: timeOf(p) })));
   let minTime = Math.min(...allPoints.map((p) => p.time));
   let maxTime = Math.max(...allPoints.map((p) => p.time));
   if (minTime === maxTime) {
@@ -157,7 +183,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
       ? []
       : visible
           .map((t) => {
-            const atOrBefore = [...t.points].reverse().find((p) => new Date(p.date).getTime() <= hoverTime + 1000);
+            const atOrBefore = [...t.points].reverse().find((p) => timeOf(p) <= hoverTime + 1000);
             return atOrBefore ? { id: t.participant.id, name: t.participant.name, color: t.color, value: atOrBefore.value } : null;
           })
           .filter(Boolean)
@@ -234,7 +260,7 @@ export default function ContestantsChart({ title, valueLabel, timelines, emptyMe
           )}
 
           {visible.map((t) => {
-            const coords = t.points.map((p) => [xScale(new Date(p.date).getTime()), yScale(p.value)]);
+            const coords = t.points.map((p) => [xScale(timeOf(p)), yScale(p.value)]);
             const linePath = coords.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
             return (
               <g key={t.participant.id}>
