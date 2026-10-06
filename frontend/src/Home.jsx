@@ -5,6 +5,7 @@ import { Button, Card, CardContent, Input } from "@kilden/designsystem";
 import { createLeaderboard } from "./api.js";
 import { loadRecents } from "./recents.js";
 import { cx } from "./utils/cx.js";
+import { activeHolidayTheme } from "./utils/holidayTheme.js";
 
 const SCORING_MODES = [
   {
@@ -88,6 +89,11 @@ export default function Home() {
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-neutral-text-default sm:text-3xl">
             Leaderboard
+            {activeHolidayTheme === "halloween" && (
+              <span aria-hidden="true" className="ml-2">
+                🎃
+              </span>
+            )}
           </h1>
           <p className="mt-2 text-sm text-neutral-text-subtle">
             Create a leaderboard, share the link, track who's winning.
