@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Zap, Pencil, Trash2 } from "lucide-react";
 import { Badge, Card, CardContent } from "@kilden/designsystem";
 import EmptyState from "./ui/EmptyState.jsx";
-import ConfirmDialog from "./ui/ConfirmDialog.jsx";
+import AdminConfirmDialog from "./AdminConfirmDialog.jsx";
 
 function formatDate(isoString) {
   return new Date(isoString).toLocaleString(undefined, {
@@ -90,14 +90,13 @@ export default function MatchHistory({ matches, onEdit, onDelete }) {
         ))}
       </div>
 
-      <ConfirmDialog
+      <AdminConfirmDialog
         isOpen={Boolean(pendingDelete)}
         onOpenChange={(open) => !open && setPendingDelete(null)}
         title="Delete this match?"
-        description="Ratings will be recalculated as if it never happened. This can't be undone."
+        description="Ratings will be recalculated as if it never happened. This can't be undone. Enter the admin password to confirm."
         confirmLabel="Delete"
-        danger
-        onConfirm={() => onDelete(pendingDelete)}
+        onConfirm={(password) => onDelete(pendingDelete, password)}
       />
     </>
   );

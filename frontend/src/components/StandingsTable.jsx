@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Trash2, Users } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@kilden/designsystem";
 import Avatar from "./Avatar.jsx";
-import DeleteParticipantDialog from "./DeleteParticipantDialog.jsx";
+import AdminConfirmDialog from "./AdminConfirmDialog.jsx";
 import EmptyState from "./ui/EmptyState.jsx";
 import StreakBadge from "./StreakBadge.jsx";
 import RankMovement from "./RankMovement.jsx";
@@ -214,10 +214,12 @@ export default function StandingsTable({
         ))}
       </ul>
 
-      <DeleteParticipantDialog
-        participant={pendingDelete}
-        historyNoun={historyNoun}
+      <AdminConfirmDialog
+        isOpen={Boolean(pendingDelete)}
         onOpenChange={(open) => !open && setPendingDelete(null)}
+        title={`Remove ${pendingDelete?.name ?? ""}?`}
+        description={`This also deletes their ${historyNoun} history. This can't be undone. Enter the admin password to confirm.`}
+        confirmLabel="Remove"
         onConfirm={(password) => onDelete(pendingDelete, password)}
       />
     </>

@@ -60,14 +60,11 @@ export default function LeaderboardPage() {
     await refresh();
   }
 
-  async function handleDeleteMatch(match) {
-    try {
-      await deleteMatch(match.id);
-      addToast("Match deleted", { type: "error", duration: 2500 });
-      await refresh();
-    } catch (err) {
-      addToast(err.message, { type: "error" });
-    }
+  // Same as participants: a wrong admin password is shown inline in the dialog.
+  async function handleDeleteMatch(match, password) {
+    await deleteMatch(match.id, password);
+    addToast("Match deleted", { type: "error", duration: 2500 });
+    await refresh();
   }
 
   function copyLink() {
