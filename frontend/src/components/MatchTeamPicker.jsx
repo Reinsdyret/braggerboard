@@ -1,4 +1,5 @@
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@kilden/designsystem";
+import { useState } from "react";
+import { Combobox, ComboboxItem } from "@kilden/designsystem";
 import { cx } from "../utils/cx.js";
 
 export const OUTCOMES = [
@@ -6,6 +7,42 @@ export const OUTCOMES = [
   { value: "DRAW", label: "Draw" },
   { value: "TEAM_B", label: "Team B" },
 ];
+
+/**
+ * A participant slot you can type into to search by name. Kilden's built-in filtering matches on
+ * the item value, which is a UUID here, so it's switched off and the list is filtered by name
+ * instead. Case-insensitive substring match: "sin" finds Sindre. The search is cleared whenever the
+ * list closes, so the closed field (which takes its label from the items) always has every name.
+ */
+function ParticipantCombobox({ value, options, onChange, label }) {
+  const [search, setSearch] = useState("");
+  const query = search.trim().toLowerCase();
+  const matches = query ? options.filter((p) => p.name.toLowerCase().includes(query)) : options;
+
+  return (
+    <Combobox
+      value={value}
+      onValueChange={(next) => {
+        setSearch("");
+        // Kilden reports "" when the list closes with nothing typed, e.g. clicking into a filled
+        // slot and back out. That would silently wipe the pick, so only real choices go through.
+        if (next) onChange(next);
+      }}
+      onSearchChange={setSearch}
+      onOpenChange={(open) => !open && setSearch("")}
+      shouldFilter={false}
+      aria-label={label}
+      placeholder="Search participant…"
+      emptyMessage="No participant with that name"
+    >
+      {matches.map((p) => (
+        <ComboboxItem key={p.id} value={p.id}>
+          {p.name}
+        </ComboboxItem>
+      ))}
+    </Combobox>
+  );
+}
 
 export default function MatchTeamPicker({
   participants,
@@ -34,22 +71,13 @@ export default function MatchTeamPicker({
         <div className="flex flex-1 flex-col gap-2">
           <p className="text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Team A</p>
           {teamA.map((value, i) => (
-            <Select
+            <ParticipantCombobox
               key={i}
-              value={value || undefined}
-              onValueChange={(next) => updateSlot(onTeamAChange, teamA, i, next)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose participant…" />
-              </SelectTrigger>
-              <SelectContent>
-                {optionsFor(value).map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              value={value}
+              options={optionsFor(value)}
+              onChange={(next) => updateSlot(onTeamAChange, teamA, i, next)}
+              label={`Team A, player ${i + 1}`}
+            />
           ))}
         </div>
 
@@ -58,22 +86,13 @@ export default function MatchTeamPicker({
         <div className="flex flex-1 flex-col gap-2">
           <p className="text-xs font-semibold tracking-wide text-neutral-text-subtle uppercase">Team B</p>
           {teamB.map((value, i) => (
-            <Select
+            <ParticipantCombobox
               key={i}
-              value={value || undefined}
-              onValueChange={(next) => updateSlot(onTeamBChange, teamB, i, next)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose participant…" />
-              </SelectTrigger>
-              <SelectContent>
-                {optionsFor(value).map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              value={value}
+              options={optionsFor(value)}
+              onChange={(next) => updateSlot(onTeamBChange, teamB, i, next)}
+              label={`Team B, player ${i + 1}`}
+            />
           ))}
         </div>
       </div>
