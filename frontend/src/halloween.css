@@ -1,0 +1,196 @@
+/* Halloween theme: a pumpkin-lit night. App.jsx switches the page to Kilden's ild-dark theme and
+   sets data-holiday (see utils/holidayTheme.js), so every token not listed here keeps its dark
+   value whatever the OS setting. These override the colors on top: the attribute selector
+   out-specifies Kilden's [data-theme] blocks, so every design-system component and our own
+   utilities pick them up without per-component changes. */
+html[data-holiday="halloween"] {
+  color-scheme: dark;
+
+  /* Night sky: near-black with a purple cast */
+  --color-neutral-background-default: #120d1a;
+  --color-neutral-background-tinted: #181122;
+  --color-neutral-surface-default: #1f162b;
+  --color-neutral-surface-tinted: #251b33;
+  --color-neutral-surface-hover: #2d213d;
+  --color-neutral-surface-active: #3a2b4f;
+  --color-neutral-border-subtle: #3f3052;
+  --color-neutral-border-default: #75628c;
+  --color-neutral-border-strong: #a693bd;
+  --color-neutral-text-subtle: #b3a4c6;
+  --color-neutral-text-default: #f3ecf8;
+  /* Primary buttons: pumpkin */
+  --color-neutral-base-default: #f28c28;
+  --color-neutral-base-hover: #f6a24f;
+  --color-neutral-base-active: #d97412;
+  --color-neutral-base-contrast-subtle: #2a1503;
+  --color-neutral-base-contrast-default: #140a00;
+
+  /* Accent: pumpkin orange */
+  --color-accent-background-default: #1e1208;
+  --color-accent-background-tinted: #2a180a;
+  --color-accent-surface-default: #35200d;
+  --color-accent-surface-tinted: #3d250f;
+  --color-accent-surface-hover: #4a2d12;
+  --color-accent-surface-active: #5e3a17;
+  --color-accent-border-subtle: #6e441a;
+  --color-accent-border-default: #c06a1f;
+  --color-accent-border-strong: #f28c28;
+  --color-accent-text-subtle: #f6a24f;
+  --color-accent-text-default: #ffc285;
+  --color-accent-base-default: #f28c28;
+  --color-accent-base-hover: #f6a24f;
+  --color-accent-base-active: #d97412;
+  --color-accent-base-contrast-subtle: #2a1503;
+  --color-accent-base-contrast-default: #140a00;
+
+  /* Dominant: witch's purple */
+  --color-dominant-background-default: #170f22;
+  --color-dominant-background-tinted: #1e132d;
+  --color-dominant-surface-default: #271839;
+  --color-dominant-surface-tinted: #2e1c43;
+  --color-dominant-surface-hover: #372251;
+  --color-dominant-surface-active: #452a66;
+  --color-dominant-border-subtle: #533379;
+  --color-dominant-border-default: #8a63b8;
+  --color-dominant-border-strong: #b495da;
+  --color-dominant-text-subtle: #b495da;
+  --color-dominant-text-default: #efe6fa;
+  --color-dominant-base-default: #6b3fa0;
+  --color-dominant-base-hover: #7d50b3;
+  --color-dominant-base-active: #5a3388;
+  --color-dominant-base-contrast-subtle: #ddd0ec;
+  --color-dominant-base-contrast-default: #fff;
+
+  /* Success: slime green */
+  --color-success-background-tinted: #0f2210;
+  --color-success-surface-hover: #183a1a;
+  --color-success-text-default: #c9f7a8;
+  --color-success-text-subtle: #8fd65e;
+  --color-success-base-default: #6cc644;
+
+  /* Danger: blood red */
+  --color-danger-background-tinted: #2e0c10;
+  --color-danger-surface-hover: #4a1219;
+  --color-danger-text-default: #ffd9dc;
+  --color-danger-text-subtle: #ff8a94;
+  --color-danger-base-default: #c81d2e;
+  --color-danger-base-hover: #dd3445;
+  --color-danger-base-active: #a8141f;
+  --color-danger-base-contrast-default: #fff;
+}
+
+/* A low harvest moon glowing in the top corner, behind everything. Fixed so it stays put on scroll. */
+html[data-holiday="halloween"] body {
+  background-image:
+    radial-gradient(circle at 88% 6%, rgb(255 194 133 / 0.16) 0, rgb(242 140 40 / 0.07) 9rem, transparent 22rem),
+    radial-gradient(ellipse at 10% 100%, rgb(107 63 160 / 0.18) 0, transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Pumpkin rain and flying witches (components/HalloweenSky.jsx). Above the page content but below
+   dialogs and toasts (z-50), and never in the way of a click. */
+.halloween-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.halloween-pumpkin {
+  position: absolute;
+  top: 0;
+  line-height: 1;
+  opacity: 0.85;
+  animation-name: halloween-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.halloween-pumpkin-sway {
+  display: inline-block;
+  animation: halloween-sway ease-in-out infinite alternate;
+}
+
+/* Starts above the top edge and ends below the bottom, so pumpkins never pop in or out. */
+@keyframes halloween-fall {
+  from {
+    transform: translateY(-3rem);
+  }
+  to {
+    transform: translateY(calc(100vh + 3rem));
+  }
+}
+
+@keyframes halloween-sway {
+  from {
+    transform: translateX(-10px) rotate(-18deg);
+  }
+  to {
+    transform: translateX(10px) rotate(18deg);
+  }
+}
+
+.halloween-witch {
+  position: absolute;
+  left: 0;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  /* Holds the off-screen start position during the delay, instead of parking at the left edge. */
+  animation-fill-mode: backwards;
+}
+
+.halloween-witch-right {
+  animation-name: halloween-fly-right;
+}
+
+.halloween-witch-left {
+  animation-name: halloween-fly-left;
+}
+
+/* The SVG faces right; mirrored when flying the other way. */
+.halloween-witch-left .halloween-witch-figure {
+  transform: scaleX(-1);
+}
+
+.halloween-witch-figure {
+  color: #07040b;
+  filter: drop-shadow(0 0 6px rgb(242 140 40 / 0.55));
+}
+
+.halloween-witch-bob {
+  animation: halloween-bob 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes halloween-fly-right {
+  from {
+    transform: translateX(-160px);
+  }
+  to {
+    transform: translateX(calc(100vw + 20px));
+  }
+}
+
+@keyframes halloween-fly-left {
+  from {
+    transform: translateX(calc(100vw + 20px));
+  }
+  to {
+    transform: translateX(-160px);
+  }
+}
+
+@keyframes halloween-bob {
+  from {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+  to {
+    transform: translateY(8px) rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halloween-sky {
+    display: none;
+  }
+}
