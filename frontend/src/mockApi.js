@@ -43,6 +43,10 @@ function participantName(id) {
   return db.participants.get(id)?.name ?? "Unknown";
 }
 
+function requireAdminPassword(leaderboardId, password) {
+  if (password !== db.leaderboards.get(leaderboardId)?.adminPassword) throw new Error("Incorrect admin password");
+}
+
 function participantsOf(leaderboardId) {
   return [...db.participants.values()].filter((p) => p.leaderboardId === leaderboardId);
 }
@@ -350,7 +354,7 @@ export async function deleteLeaderboard(id, password) {
   await delay();
   const leaderboard = db.leaderboards.get(id);
   if (!leaderboard) throw new Error(`Leaderboard ${id} not found`);
-  if (password !== leaderboard.adminPassword) throw new Error("Incorrect admin password");
+  requireAdminPassword(id, password);
 
   db.leaderboards.delete(id);
   for (const p of participantsOf(id)) {
@@ -397,9 +401,7 @@ export async function deleteParticipant(participantId, password) {
   await delay();
   const participant = db.participants.get(participantId);
   if (!participant) throw new Error(`Participant ${participantId} not found`);
-  if (password !== db.leaderboards.get(participant.leaderboardId)?.adminPassword) {
-    throw new Error("Incorrect admin password");
-  }
+  requireAdminPassword(participant.leaderboardId, password);
   db.participants.delete(participantId);
   db.changes.delete(participantId);
   for (const m of db.matches.values()) {
@@ -510,10 +512,11 @@ export async function getMatches(leaderboardId) {
   return matches.map(toMatchDto);
 }
 
-export async function updateMatch(matchId, teamA, teamB, outcome) {
+export async function updateMatch(matchId, teamA, teamB, outcome, password) {
   await delay();
   const match = db.matches.get(matchId);
   if (!match) throw new Error(`Match ${matchId} not found`);
+  requireAdminPassword(match.leaderboardId, password);
   validateTeams(match.leaderboardId, teamA, teamB);
 
   match.teamA = teamA.map((pid) => ({ participantId: pid }));
@@ -522,9 +525,11 @@ export async function updateMatch(matchId, teamA, teamB, outcome) {
   return toMatchDto(match);
 }
 
-export async function deleteMatch(matchId) {
+export async function deleteMatch(matchId, password) {
   await delay();
-  if (!db.matches.has(matchId)) throw new Error(`Match ${matchId} not found`);
+  const match = db.matches.get(matchId);
+  if (!match) throw new Error(`Match ${matchId} not found`);
+  requireAdminPassword(match.leaderboardId, password);
   db.matches.delete(matchId);
   return null;
 }

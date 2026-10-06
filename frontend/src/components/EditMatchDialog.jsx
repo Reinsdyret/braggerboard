@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Button } from "@kilden/designsystem";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Button, Input } from "@kilden/designsystem";
 import { AlertCircle } from "lucide-react";
 import { updateMatch } from "../api.js";
 import { useToast } from "./ui/ToastProvider.jsx";
@@ -9,6 +9,7 @@ export default function EditMatchDialog({ match, participants, isOpen, onOpenCha
   const [teamA, setTeamA] = useState([]);
   const [teamB, setTeamB] = useState([]);
   const [outcome, setOutcome] = useState("TEAM_A");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const addToast = useToast();
@@ -18,6 +19,7 @@ export default function EditMatchDialog({ match, participants, isOpen, onOpenCha
       setTeamA(match.teamA.map((p) => p.participantId));
       setTeamB(match.teamB.map((p) => p.participantId));
       setOutcome(match.outcome);
+      setPassword("");
       setError(null);
     }
   }, [match]);
@@ -41,7 +43,7 @@ export default function EditMatchDialog({ match, participants, isOpen, onOpenCha
     setSubmitting(true);
     setError(null);
     try {
-      await updateMatch(match.id, teamA, teamB, outcome);
+      await updateMatch(match.id, teamA, teamB, outcome, password);
       addToast("Match updated");
       onOpenChange(false);
       onUpdated();
@@ -70,6 +72,15 @@ export default function EditMatchDialog({ match, participants, isOpen, onOpenCha
             onOutcomeChange={setOutcome}
           />
 
+          <Input
+            type="password"
+            placeholder="Admin password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
           <div className="flex gap-2">
             <Button
               type="button"
@@ -80,7 +91,7 @@ export default function EditMatchDialog({ match, participants, isOpen, onOpenCha
             >
               Cancel
             </Button>
-            <Button type="submit" isLoading={submitting} disabled={!canSubmit} className="flex-1">
+            <Button type="submit" isLoading={submitting} disabled={!canSubmit || !password} className="flex-1">
               Save changes
             </Button>
           </div>

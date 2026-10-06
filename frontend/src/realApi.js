@@ -94,16 +94,20 @@ export function getMatches(leaderboardId) {
   return fetch(`${API_BASE}/leaderboards/${leaderboardId}/matches`, { cache: "no-store" }).then(handle);
 }
 
-export function updateMatch(matchId, teamA, teamB, outcome) {
+export function updateMatch(matchId, teamA, teamB, outcome, password) {
   return fetch(`${API_BASE}/matches/${matchId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ teamA, teamB, outcome }),
+    body: JSON.stringify({ teamA, teamB, outcome, password }),
   }).then(handle);
 }
 
-export function deleteMatch(matchId) {
-  return fetch(`${API_BASE}/matches/${matchId}`, { method: "DELETE" }).then(handle);
+export function deleteMatch(matchId, password) {
+  return fetch(`${API_BASE}/matches/${matchId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  }).then(handle);
 }
 
 export function participantImageUrl(participantId) {

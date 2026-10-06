@@ -25,6 +25,16 @@ import java.util.UUID
 
 data class CreateMatchRequest(val teamA: List<UUID>, val teamB: List<UUID>, val outcome: MatchOutcome)
 
+// Editing or removing a recorded match rewrites everyone's Elo history, so it's admin-only.
+data class UpdateMatchRequest(
+    val teamA: List<UUID>,
+    val teamB: List<UUID>,
+    val outcome: MatchOutcome,
+    val password: String = "",
+)
+
+data class DeleteMatchRequest(val password: String)
+
 @RestController
 class MatchController(
     private val matchRepository: MatchRepository,
@@ -36,23 +46,25 @@ class MatchController(
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@PathVariable leaderboardId: UUID, @RequestBody request: CreateMatchRequest): Match {
         val leaderboard = leaderboardService.requireExists(leaderboardId)
-        val input = validated(leaderboard, request)
+        val input = validated(leaderboard, request.teamA, request.teamB, request.outcome)
         return matchRepository.create(leaderboardId, input)
     }
 
     @PutMapping("/api/matches/{matchId}")
-    fun update(@PathVariable matchId: UUID, @RequestBody request: CreateMatchRequest): Match {
+    fun update(@PathVariable matchId: UUID, @RequestBody request: UpdateMatchRequest): Match {
         val existing = matchRepository.findById(matchId) ?: throw NoSuchElementException("Match $matchId not found")
+        leaderboardService.requireAdminPassword(existing.leaderboardId, request.password)
         val leaderboard = leaderboardService.requireExists(existing.leaderboardId)
-        val input = validated(leaderboard, request)
+        val input = validated(leaderboard, request.teamA, request.teamB, request.outcome)
         return matchRepository.update(matchId, input) ?: throw NoSuchElementException("Match $matchId not found")
     }
 
     @DeleteMapping("/api/matches/{matchId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun delete(@PathVariable matchId: UUID) {
-        val deleted = matchRepository.delete(matchId)
-        if (!deleted) throw NoSuchElementException("Match $matchId not found")
+    fun delete(@PathVariable matchId: UUID, @RequestBody request: DeleteMatchRequest) {
+        val existing = matchRepository.findById(matchId) ?: throw NoSuchElementException("Match $matchId not found")
+        leaderboardService.requireAdminPassword(existing.leaderboardId, request.password)
+        matchRepository.delete(matchId)
     }
 
     @GetMapping("/api/leaderboards/{leaderboardId}/matches")
@@ -63,19 +75,24 @@ class MatchController(
             .body(matchRepository.findByLeaderboardId(leaderboardId))
     }
 
-    private fun validated(leaderboard: Leaderboard, request: CreateMatchRequest): MatchInput {
+    private fun validated(
+        leaderboard: Leaderboard,
+        teamA: List<UUID>,
+        teamB: List<UUID>,
+        outcome: MatchOutcome,
+    ): MatchInput {
         require(leaderboard.scoringMode == ScoringMode.ELO) { "This leaderboard uses win-count scoring, not matches" }
 
-        require(request.teamA.isNotEmpty()) { "Each team needs at least one participant" }
-        require(request.teamA.size == request.teamB.size) { "Both teams must have the same number of participants" }
-        require(request.teamA.size <= MAX_TEAM_SIZE) { "Each team can have at most $MAX_TEAM_SIZE participants" }
+        require(teamA.isNotEmpty()) { "Each team needs at least one participant" }
+        require(teamA.size == teamB.size) { "Both teams must have the same number of participants" }
+        require(teamA.size <= MAX_TEAM_SIZE) { "Each team can have at most $MAX_TEAM_SIZE participants" }
 
-        val allIds = request.teamA + request.teamB
+        val allIds = teamA + teamB
         require(allIds.toSet().size == allIds.size) { "A participant can't appear more than once in a match" }
 
         val knownIds = participantRepository.findByLeaderboardId(leaderboard.id).map { it.id }.toSet()
         require(allIds.all { it in knownIds }) { "All participants must belong to this leaderboard" }
 
-        return MatchInput(request.teamA, request.teamB, request.outcome)
+        return MatchInput(teamA, teamB, outcome)
     }
 }
