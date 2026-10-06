@@ -49,19 +49,23 @@ function RecordGroup({ title, icon, iconClass, records }) {
 }
 
 /**
- * A group of records is only framed as "best" when there's an actual gap between the top and bottom
- * net score - otherwise that framing is a contradiction, since it labels the exact same record as
- * both the best and the worst one, so the whole list is shown flat instead. When there IS a gap,
- * everyone tied at the top (or bottom) is shown: picking one arbitrarily would hide an equally good
- * (or bad) record. The bottom end is only rendered when the caller asks for it by name.
+ * "Best" and "worst" are only claimed when the record backs them up: the top group needs a winning
+ * net score and the bottom group a losing one, so a 1-0 opponent is never the "toughest" and a 0-2
+ * teammate never the "best". The bottom end is only rendered when the caller asks for it by name.
+ * Everyone tied at the top (or bottom) is shown, since picking one arbitrarily would hide an equally
+ * good (or bad) record. When neither end qualifies, or every record is tied, the whole list is shown
+ * flat instead.
  */
 function RecordSection({ records, bestTitle, worstTitle, flatTitle }) {
   if (records.length === 0) return null;
 
   const topNet = Math.max(...records.map((r) => r.net));
   const bottomNet = Math.min(...records.map((r) => r.net));
+  const showBest = topNet > 0 && topNet !== bottomNet;
+  // A record you're still ahead on is never your "toughest" one, however small the lead.
+  const showWorst = Boolean(worstTitle) && bottomNet < 0 && topNet !== bottomNet;
 
-  if (topNet === bottomNet) {
+  if (!showBest && !showWorst) {
     return (
       <RecordGroup
         title={flatTitle}
@@ -72,26 +76,24 @@ function RecordSection({ records, bestTitle, worstTitle, flatTitle }) {
     );
   }
 
-  const best = (
-    <RecordGroup
-      title={bestTitle}
-      icon={TrendingUp}
-      iconClass="bg-success-background-tinted text-success-text-default"
-      records={records.filter((r) => r.net === topNet)}
-    />
-  );
-
-  if (!worstTitle) return best;
-
   return (
     <div className="flex flex-col gap-4">
-      {best}
-      <RecordGroup
-        title={worstTitle}
-        icon={TrendingDown}
-        iconClass="bg-danger-background-tinted text-danger-text-default"
-        records={records.filter((r) => r.net === bottomNet)}
-      />
+      {showBest && (
+        <RecordGroup
+          title={bestTitle}
+          icon={TrendingUp}
+          iconClass="bg-success-background-tinted text-success-text-default"
+          records={records.filter((r) => r.net === topNet)}
+        />
+      )}
+      {showWorst && (
+        <RecordGroup
+          title={worstTitle}
+          icon={TrendingDown}
+          iconClass="bg-danger-background-tinted text-danger-text-default"
+          records={records.filter((r) => r.net === bottomNet)}
+        />
+      )}
     </div>
   );
 }
